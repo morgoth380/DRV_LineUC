@@ -1,0 +1,729 @@
+#include    "GT_DEFs.h"
+#ifdef    GET_FUNC_CODE
+
+typedef struct{
+	union{
+		struct{
+			u16 PWM_Off  : 1; //ШИМ отключен
+			u16 Stop_DC  : 1; //Торможение постоянным током
+			u16 PickUpOn : 1; //Работает модуль подхвата
+			u16 AlrmFref : 1; //flag alarm Fref < fPusk;
+			u16 Reserv   : 12;
+		}bit;
+		u16 all;
+	}flag;
+}local_GT_type;
+
+
+typedef struct{
+    u16  Pnt_Nfunc;
+    u16  Pnt_State;
+    //u16  Pnt_nvState;
+    u16  Pnt_Fref;                         // 1  Fref         //Pnt_IN
+    u16  Pnt_UpIn;                         // 2  UpIn
+    u16  Pnt_DwnIn;                        // 3  DwnIn
+    u16  Pnt_ZerTime;                      // 4  ZerTime
+    u16  Pnt_PickUpEn;                     // 5  PickUpEn
+    u16  Pnt_GTtype;                       // 6  GTtype      //Pnt_Type
+    u16  Pnt_TimeScale;                    // 7  TimeScale   //Pnt_TimeScale
+    u16  Pnt_Fmax;                         // 8  Fmax        //Pnt_FrS
+    u16  Pnt_AccTime;                      // 9  AccTime     //Pnt_TimeUp
+    u16  Pnt_DecTime;                      //10  DecTime     //Pnt_TimeDw
+    u16  Pnt_Stype;                        //11  Stype       //Pnt_t2
+    u16  Pnt_tA1;                          //12  tA1
+    u16  Pnt_tA2;                          //13  tA2
+    u16  Pnt_tA3;                          //14  tA3
+    u16  Pnt_tA4;                          //15  tA4
+    u16  Pnt_AccFhold;                     //16  AccFhold    //Pnt_ResVal
+    u16  Pnt_AccThold;                     //17  AccThold    //Pnt_TfixFpusk
+    u16  Pnt_DecFhold;                     //18  DecFhold
+    u16  Pnt_DecThold;                     //19  DecThold
+    u16  Pnt_CurlesTime;                   //20  CurlesTime  //Pnt_Tpause
+    u16  Pnt_F_PU;                         //21  F_PU
+    u16  Pnt_ResByPWM;                     //22  ResByPWM
+    u16  Pnt_ResByDC;                      //23  ResByDC
+    u16  Pnt_Freeze1;                      //24  Freeze1     //Pnt_Freeze
+    u16  Pnt_Freeze2;                      //25  Freeze2
+    u16  Pnt_AlrmFref;                     //26  AlrmFref
+    u16  Pnt_HldOnDel;                     //27  HldOnDel    //Pnt_Fp_delay
+    u16  Pnt_Format;                       //28  Format
+    u16  Pnt_HldOnFq;                      //29  HldOnFq     //Pnt_EquRV
+    u16  Pnt_ZerroFq;                      //30  ZerroFq     //Pnt_EqZero
+    u16  Pnt_GTstate;                      //31  GTstate     //Pnt_Status
+    u16  Pnt_Dwn;                          //32  Dwn
+    u16  Pnt_Up;                           //33  Up
+    u16  Pnt_Fout;                         //34  Fout        //Pnt_Out
+    u16  Pnt_End;
+}FuncTEMP_LSU_2_type;
+//********************************************************
+u16 *FuncTEMP_LSU_2_1(FuncTEMP_LSU_2_type *progPnt, u32 ramPnt)
+{
+    Temp_koef_type		*sPnt;
+    COMMONPARAMC28		*mPnt28;
+    COMMONPARAMM3		*mPnt3;
+	local_GT_type       loc;  
+
+    u16					tempRes, tempFreeze, tempType, tempTimeScale;
+    f32                 tempFrSOld, tempF_in, tempResVal, f_PU, t_1, t_2, t_3, t_4, TlinUp, TlinDn;
+    s32                 utempFrSOld, utempFin;
+    u16                 tempTup, tempTdn;
+    u16					ZerTime;	//обнулитель времён разгона и торможения
+
+    sPnt 			= (Temp_koef_type *)(ramPnt + progPnt->Pnt_State); 
+    mPnt28			= &GlobalC28;
+    mPnt3			= &GlobalM3;
+
+/*
+    if(sPnt->StateGT.PickUpWork){
+    	tempResVal      = sPnt->F_PU;
+    }
+    else{
+    	tempResVal      = _IQtoF( load_s32(ramPnt, progPnt->Pnt_AccFhold));
+    }
+*/
+    // Доработка для подхвата - Шахов
+	tempResVal      = _IQtoF( load_s32(ramPnt, progPnt->Pnt_AccFhold));
+
+	utempFrSOld     = load_s32(ramPnt, progPnt->Pnt_Fmax);
+	tempFrSOld      = _IQtoF((s32)utempFrSOld);					//Так сделано чтобы не изменять типы во всей функции
+    utempFin        = load_s32(ramPnt, progPnt->Pnt_Fref);
+
+	if(((s32)utempFin > 0) && (utempFin > utempFrSOld))      { utempFin = utempFrSOld; } //Так сделано чтобы не изменять типы во всей функции
+	else if(((s32)utempFin < 0) && (utempFin < -utempFrSOld)){ utempFin =-utempFrSOld; } //Так сделано чтобы не изменять типы во всей функции
+
+	tempF_in		= _IQtoF((s32)utempFin);					//Так сделано чтобы не изменять типы во всей функции
+	loc.flag.bit.PWM_Off  = testBitMicro(ramPnt, progPnt->Pnt_ResByPWM); //ШИМ откл == 1, вкл == 0
+	loc.flag.bit.Stop_DC = testBitMicro(ramPnt, progPnt->Pnt_ResByDC); //Торможение постоянным током
+    loc.flag.bit.PickUpOn = testBitMicro(ramPnt, progPnt->Pnt_PickUpEn); //Включен подхват == 1, отключен == 0
+    tempRes         = ((!loc.flag.bit.PWM_Off) && (!loc.flag.bit.Stop_DC) && (!loc.flag.bit.PickUpOn));
+    tempFreeze      = testBitMicro(ramPnt, progPnt->Pnt_Freeze1)||testBitMicro(ramPnt, progPnt->Pnt_Freeze2);	   //QQQ+++
+    ZerTime			= testBitMicro(ramPnt, progPnt->Pnt_ZerTime);	   //QQQ+++
+    tempType        = load_s16(ramPnt, progPnt->Pnt_GTtype);
+    tempTimeScale   = load_s16(ramPnt, progPnt->Pnt_TimeScale);
+
+    if(flagIsFirstCall){
+    	sPnt->TfixFpusk = 0;
+    	sPnt->State.all = 0;
+    	sPnt->StateGT.all = 0;
+    	tempRes = 0;
+    	clrBitMicro(ramPnt, progPnt->Pnt_AlrmFref);
+    }
+
+	if(ZerTime){
+    	tempTup		= 0;
+    	tempTdn		= 0;
+    }
+    else{
+	    tempTup		= load_s16(ramPnt, progPnt->Pnt_AccTime);  //Время разгона
+	    tempTdn		= load_s16(ramPnt, progPnt->Pnt_DecTime);  //Время торможения
+    }
+
+    if ((sPnt->TfixFpusk > 0)/* && (sPnt->StateGT.Up == 1)*/){
+        tempFreeze |= 0x1;
+        sPnt->TfixFpusk--;
+    }
+    if((sPnt->Tpause > 0) && (tempRes == 1)){
+        tempFreeze |= 0x1;
+        sPnt->Tpause--;
+    }
+    //формирование формата
+    save_s16(ramPnt, progPnt->Pnt_Format, (21 | ((tempTimeScale & 0xFF) << 8)));
+
+    //Проверка на необходимость пересчета коэффициентов
+    if((sPnt->uFrSOld != utempFrSOld) || (sPnt->TupOld != tempTup) || (sPnt->TdnOld != tempTdn)|| 
+       (sPnt->uFrefOld != utempFin)   || (flagIsFirstCall == 1))
+	{
+    	if (sPnt->StateGT.flazhok == 0){
+			f32 t2, t3, t2_1, t3_1, t2_2, t3_2, t2_3, t3_3;                                                             //переменные для тквадрат и ткуб
+			f32 FlinDn, FlinUp, FlinDn1, FlinUp1, FlinDn2, /*FlinUp2,*/ FlinDn3, FlinUp3;
+			f32 tempF1, tempFold, absOldFout, absFin;
+			u16 tempT;
+
+			sPnt->OldF_out = sPnt->Fout;                                             //присваиваю старой частоте текущую
+
+			if((sPnt->OldF_out == 0.f) && (tempResVal != 0.f) && (utempFin != 0)) //если текущая частота 0 то прыгнуть на Fпуск
+			{                                                   
+				sPnt->State.ToRefF = 1;
+				sPnt->State.Recalc = 1;
+			}
+			else {
+
+//			    if ((( )&&( ))||(( )&&( )))
+			    if(((sPnt->OldF_out > 0.f) && (tempF_in > 0.f)) ||
+                   ((sPnt->OldF_out < 0.f) && (tempF_in < 0.f)))
+				{
+                            sPnt->State.ToUp = 1;
+                }
+
+				if( (sPnt->State.ToUp == 0) && (tempResVal != 0.f)&& 
+				   ((sPnt->OldF_out == tempResVal) || (sPnt->OldF_out == -tempResVal))) //если спускались по частоте и дошли до Fпуск
+				{
+					//то надо прыгнуть в 0
+					sPnt->State.ToZero = 1;
+				}
+				else {
+					if(tempF_in != 0.f){
+						sPnt->State.NeedZero = 0;                                   //устанавливаем бит необходимости прыгнуть в 0
+					}
+					if((tempF_in == 0.f) && (sPnt->OldF_out != 0.f)) {                //если задание 0
+																					//то спускаемся до пусковой
+						sPnt->State.Recalc = 1;
+
+						sPnt->State.NeedZero = 1;                                   //устанавливаем бит необходимости прыгнуть в 0
+																					//после отработки задания
+						tempF_in = (sPnt->OldF_out > 0.f) ? tempResVal: -tempResVal;
+						sPnt->tempFin = tempF_in;
+
+						sPnt->uFrefOld   = utempFin;
+					}
+					else {
+						if((sPnt->State.ToZero == 0) &&                                     //если реверс то едем до F пусковой
+						   (((sPnt->OldF_out > 0.f) && (tempF_in < 0.f)) ||
+							((sPnt->OldF_out < 0.f) && (tempF_in > 0.f))))
+						{
+							sPnt->StateGT.RevCur = 1;
+							sPnt->StateGT.RevRef = 1;
+
+							tempF_in = (tempF_in > 0.f) ? -tempResVal: tempResVal;
+							sPnt->tempFin = tempF_in;
+							sPnt->State.Revers = 1;
+
+							sPnt->State.Recalc = 1;
+							sPnt->uFrefOld   = utempFin;// - 1;
+						}
+						else {                                                            //после проезда до F пуск выезжаем на задание
+							sPnt->State.Recalc = 1;
+							absFin = (tempF_in > 0.f) ? tempF_in : -tempF_in;
+
+							if((absFin < tempResVal) && (tempF_in != 0.f)) {
+
+								tempF_in = 0.f;//(tempFin > 0.f) ? tempResVal : -tempResVal;
+							}
+							sPnt->tempFin = tempF_in;
+							sPnt->uFrefOld   = utempFin;
+						}
+					}
+				}
+			}
+
+			if(sPnt->State.Recalc) {
+
+				sPnt->State.Recalc = 0;
+				sPnt->FrSOld     = tempFrSOld;
+				sPnt->uFrSOld    = utempFrSOld;                                                 //Новое значение максимальной частоты
+				sPnt->FrefOld    = tempF_in;
+
+				sPnt->TdnOld     = tempTdn;                                                     //Новое значение времени торможения
+				sPnt->TupOld     = tempTup;                                                     //Новое значение времени разгона
+
+				absOldFout = (sPnt->OldF_out > 0.f) ? sPnt->OldF_out : -sPnt->OldF_out;
+				absFin = (tempF_in > 0.f) ? tempF_in : -tempF_in;
+
+
+				tempF1 = absFin;
+				tempFold = absOldFout;
+
+				if(absOldFout < absFin) {
+					// Расчет коэффициентов для разгонной кривой
+					tempFold = tempF1 - tempFold;
+
+					tempF1 = sPnt->FrefOld - sPnt->OldF_out;
+
+					tempT = tempTup;
+					sPnt->State.ToUp = 1;
+					sPnt->StateGT.Dwn = 0;
+					sPnt->StateGT.Up = 1;
+					sPnt->StateGT.EqRefVal=0;
+				}
+				else {
+					// Расчет коэффициентов для кривой торможения
+					tempFold -= tempF1;
+
+					tempF1 = sPnt->OldF_out - sPnt->FrefOld;
+
+					tempT = tempTdn;
+					sPnt->State.ToUp = 0;
+					sPnt->StateGT.Dwn = 1;
+					sPnt->StateGT.Up = 0;
+					sPnt->StateGT.EqRefVal=0;
+				}
+
+				//вычисляем время до выхода на Fin от текущей частоты
+				if(tempFrSOld != 0) sPnt->TfupOld = (tempFold * (tempT * TimeScale[tempTimeScale])) / tempFrSOld;
+				else sPnt->TfupOld = 0.f;
+				if (load_s16(ramPnt, progPnt->Pnt_Stype) == 1){
+					t_1 = _IQtoF(load_s32(ramPnt, progPnt->Pnt_tA1));
+					t_2 = _IQtoF(load_s32(ramPnt, progPnt->Pnt_tA2));
+					t_4 = _IQtoF(load_s32(ramPnt, progPnt->Pnt_tA3));
+					t_3 = _IQtoF(load_s32(ramPnt, progPnt->Pnt_tA4));
+
+					if (t_1 < 0.07f) t_1 = 0.07f;
+					if (t_2 < 0.07f) t_2 = 0.07f;
+					if (t_3 < 0.07f) t_3 = 0.07f;
+					if (t_4 < 0.07f) t_4 = 0.07f;
+
+					if (t_1 > 0.85f) t_1 = 0.85f;
+					if (t_2 > 0.85f) t_2 = 0.85f;
+					if (t_3 > 0.85f) t_3 = 0.85f;
+					if (t_4 > 0.85f) t_4 = 0.85f;
+
+					if ((1.f - t_1 - t_2) < 0.05f) t_1 -= (0.05f - (1.0f - t_1 - t_2));
+					if ((1.f - t_3 - t_4) < 0.05f) t_3 -= (0.05f - (1.0f - t_3 - t_4));
+
+					FlinDn = tempF1 * (t_1 - 0.035f);                    //Вычисление верхней и нижней точек перегиба
+					FlinUp = tempF1 - FlinDn;                                                       //по оси частоты
+					FlinDn1 = tempF1 * (t_2 - 0.035f);                    //Вычисление верхней и нижней точек перегиба
+					FlinUp1 = tempF1 - FlinDn1;                                                       //по оси частоты
+					FlinDn2 = tempF1 * (t_3 - 0.035f);                    //Вычисление верхней и нижней точек перегиба
+	//                FlinUp2 = tempF1 - FlinDn2;                                                       //по оси частоты
+					FlinDn3 = tempF1 * (t_4 - 0.035f);                    //Вычисление верхней и нижней точек перегиба
+					FlinUp3 = tempF1 - FlinDn3;                                                       //по оси частоты
+
+
+					sPnt->TlinDn = sPnt->TfupOld * t_1;      //Вычисление нижней и верхней точек перегиба
+					sPnt->TlinUp = sPnt->TfupOld - sPnt->TlinDn;                                    //по оси времени
+					sPnt->TlinDn1 = sPnt->TfupOld * t_2;      //Вычисление нижней и верхней точек перегиба
+					sPnt->TlinUp1 = sPnt->TfupOld - sPnt->TlinDn1;                                    //по оси времени
+					sPnt->TlinDn2 = sPnt->TfupOld * t_3;      //Вычисление нижней и верхней точек перегиба
+					sPnt->TlinUp2 = sPnt->TfupOld - sPnt->TlinDn2;                                    //по оси времени
+					sPnt->TlinDn3 = sPnt->TfupOld * t_4;      //Вычисление нижней и верхней точек перегиба
+					sPnt->TlinUp3 = sPnt->TfupOld - sPnt->TlinDn3;                                    //по оси времени
+
+					t2 = sPnt->TlinDn * sPnt->TlinDn;
+					t3 = sPnt->TlinDn * sPnt->TlinDn * sPnt->TlinDn;
+					t2_1 = sPnt->TlinDn1 * sPnt->TlinDn1;
+					t3_1 = sPnt->TlinDn1 * sPnt->TlinDn1 * sPnt->TlinDn1;
+					t2_2 = sPnt->TlinDn2 * sPnt->TlinDn2;
+					t3_2 = sPnt->TlinDn2 * sPnt->TlinDn2 * sPnt->TlinDn2;
+					t2_3 = sPnt->TlinDn3 * sPnt->TlinDn3;
+					t3_3 = sPnt->TlinDn3 * sPnt->TlinDn3 * sPnt->TlinDn3;
+
+					// Разгон нижний диапазон
+					if(sPnt->TlinDn != 0.f) {
+
+						sPnt->KoefK = (FlinUp1 - FlinDn) / (sPnt->TlinUp1 - sPnt->TlinDn);            //вычисление коэфициента К для прямого участка
+						// k=y/x
+						sPnt->KoefA = ((sPnt->KoefK  * sPnt->TlinDn) - (2 * FlinDn)) / t3;          //вычисление коэфициента А для полинома
+
+						sPnt->KoefB = ((3 * FlinDn) - (sPnt->KoefK * sPnt->TlinDn)) / t2;           //вычисление коэфициента Б для полинома
+
+						sPnt->KoefBLin = (sPnt->KoefA * t3 + sPnt->KoefB * t2)                      //вычисление коэфициента Б для прямого участка
+										 - sPnt->KoefK * sPnt->TlinDn;
+
+						sPnt->LinKoefK = tempF1 / sPnt->TfupOld;                                    //вычисление коэффициента К для линейного
+																									// генератора темпа
+					}
+					else {
+
+						sPnt->KoefK    = 0.f;
+						sPnt->KoefA    = 0.f;
+						sPnt->KoefB    = 0.f;
+						sPnt->KoefBLin = 0.f;
+					}
+
+					// Разгон верхний диапазон
+					if(sPnt->TlinDn1 != 0.f) {
+
+		//                sPnt->KoefK_1 = (FlinUp1 - FlinDn1) / (sPnt->TlinUp1 - sPnt->TlinDn1);            //вычисление коэфициента К для прямого участка
+						// k=y/x
+						sPnt->KoefA_1 = ((sPnt->KoefK  * sPnt->TlinDn1) - (2 * FlinDn1)) / t3_1;          //вычисление коэфициента А для полинома
+
+						sPnt->KoefB_1 = ((3 * FlinDn1) - (sPnt->KoefK * sPnt->TlinDn1)) / t2_1;           //вычисление коэфициента Б для полинома
+
+						sPnt->KoefBLin_1 = (sPnt->KoefA_1 * t3_1 + sPnt->KoefB_1 * t2_1)                      //вычисление коэфициента Б для прямого участка
+										 - sPnt->KoefK * sPnt->TlinDn1;
+
+		//                sPnt->LinKoefK_1 = tempF1 / sPnt->TfupOld;                                    //вычисление коэффициента К для линейного
+																									// генератора темпа
+					}
+					else {
+
+						sPnt->KoefK    = 0.f;
+						sPnt->KoefA    = 0.f;
+						sPnt->KoefB    = 0.f;
+						sPnt->KoefBLin = 0.f;
+					}
+
+					// Торможение верхний диапазон
+					if(sPnt->TlinDn2 != 0.f) {
+
+						sPnt->KoefK_3 = (FlinUp3 - FlinDn2) / (sPnt->TlinUp3 - sPnt->TlinDn2);            //вычисление коэфициента К для прямого участка
+						// k=y/x
+						sPnt->KoefA_2 = ((sPnt->KoefK_3  * sPnt->TlinDn2) - (2 * FlinDn2)) / t3_2;          //вычисление коэфициента А для полинома
+
+						sPnt->KoefB_2 = ((3 * FlinDn2) - (sPnt->KoefK_3 * sPnt->TlinDn2)) / t2_2;           //вычисление коэфициента Б для полинома
+
+						sPnt->KoefBLin_2 = (sPnt->KoefA_2 * t3_2 + sPnt->KoefB_2 * t2_2)                      //вычисление коэфициента Б для прямого участка
+										 - sPnt->KoefK_3 * sPnt->TlinDn2;
+
+		//                sPnt->LinKoefK_1 = tempF1 / sPnt->TfupOld;                                    //вычисление коэффициента К для линейного
+																									// генератора темпа
+					}
+					else {
+
+						sPnt->KoefK    = 0.f;
+						sPnt->KoefA    = 0.f;
+						sPnt->KoefB    = 0.f;
+						sPnt->KoefBLin = 0.f;
+					}
+
+					// Торможение нижний диапазон
+					if(sPnt->TlinDn3 != 0.f) {
+
+		//                sPnt->KoefK_3 = (FlinUp3 - FlinDn2) / (sPnt->TlinUp3 - sPnt->TlinDn2);            //вычисление коэфициента К для прямого участка
+						// k=y/x
+						sPnt->KoefA_3 = ((sPnt->KoefK_3  * sPnt->TlinDn3) - (2 * FlinDn3)) / t3_3;          //вычисление коэфициента А для полинома
+
+						sPnt->KoefB_3 = ((3 * FlinDn3) - (sPnt->KoefK_3 * sPnt->TlinDn3)) / t2_3;           //вычисление коэфициента Б для полинома
+
+						sPnt->KoefBLin_3 = (sPnt->KoefA_3 * t3_3 + sPnt->KoefB_3 * t2_3)                      //вычисление коэфициента Б для прямого участка
+										 - sPnt->KoefK_3 * sPnt->TlinDn3;
+
+		//                sPnt->LinKoefK_1 = tempF1 / sPnt->TfupOld;                                    //вычисление коэффициента К для линейного
+																									// генератора темпа
+					}
+					else {
+
+						sPnt->KoefK    = 0.f;
+						sPnt->KoefA    = 0.f;
+						sPnt->KoefB    = 0.f;
+						sPnt->KoefBLin = 0.f;
+					}
+				}else{
+					FlinDn = tempF1 * 0.2f;                    //Вычисление верхней и нижней точек перегиба
+					FlinUp = tempF1 - FlinDn;                                                       //по оси частоты
+					sPnt->TlinDn = sPnt->TfupOld * 0.3f;      //Вычисление нижней и верхней точек перегиба
+					sPnt->TlinUp = sPnt->TfupOld - sPnt->TlinDn;                                    //по оси времени
+					t2 = sPnt->TlinDn * sPnt->TlinDn;
+					t3 = sPnt->TlinDn * sPnt->TlinDn * sPnt->TlinDn;
+					if(sPnt->TlinDn != 0.f) {
+
+						sPnt->KoefK = (FlinUp - FlinDn) / (sPnt->TlinUp - sPnt->TlinDn);            //вычисление коэфициента К для прямого участка
+						// k=y/x
+						sPnt->KoefA = ((sPnt->KoefK  * sPnt->TlinDn) - (2 * FlinDn)) / t3;          //вычисление коэфициента А для полинома
+
+						sPnt->KoefB = ((3 * FlinDn) - (sPnt->KoefK * sPnt->TlinDn)) / t2;           //вычисление коэфициента Б для полинома
+
+						sPnt->KoefBLin = (sPnt->KoefA * t3 + sPnt->KoefB * t2)                      //вычисление коэфициента Б для прямого участка
+										 - sPnt->KoefK * sPnt->TlinDn;
+
+						sPnt->LinKoefK = tempF1 / sPnt->TfupOld;                                    //вычисление коэффициента К для линейного
+						sPnt->ParKoefK = tempF1 / (sPnt->TfupOld * sPnt->TfupOld);					//Вычисление коэффициента К для U-образного генератора темпа
+																									// генератора темпа
+					}
+					else {
+
+						sPnt->KoefK    = 0.f;
+						sPnt->KoefA    = 0.f;
+						sPnt->KoefB    = 0.f;
+						sPnt->KoefBLin = 0.f;
+					}
+					sPnt->TlinDn3 = sPnt->TlinDn;
+					sPnt->TlinUp1 = sPnt->TlinUp2 = sPnt->TlinUp;
+					sPnt->KoefA_3 = sPnt->KoefA_2 = sPnt->KoefA_1 = sPnt->KoefA;
+					sPnt->KoefB_3 = sPnt->KoefB_2 = sPnt->KoefB_1 = sPnt->KoefB;
+					sPnt->KoefBLin_3 = sPnt->KoefBLin;
+					sPnt->KoefK_3 = sPnt->KoefK;
+				}
+			}
+
+			sPnt->State.Done = 0;                                                   //устанавливаю флаг того, что работа невыполнена
+			sPnt->CurTime = 0.f;
+			sPnt->StateGT.flazhok = 1;
+    	}else{
+    		sPnt->StateGT.flazhok = 0;
+    	}
+    }
+
+    //-- Для корректной отработки Fпуск=0;
+    if(tempRes && sPnt->StateGT.Reset) {
+		//sPnt->StateGT.EqRefVal = 0;
+		//sPnt->State.Done       = 0;
+        //sPnt->State.ToRefF     = 1;
+    	sPnt->StateGT.all      = 0;
+    	sPnt->State.all        = 0;
+    	sPnt->State.ToRefF     = 1;
+		//sPnt->TfixFpusk = load_s16(ramPnt, progPnt->Pnt_AccThold) * (K_TIME_CALL_MICRO_TAKT / 10);
+		//tempFreeze = 0;	//Необходимо чтобы по пуску выполнилась ветка -"if(sPnt->State.ToRefF) { //если надо прыгнуть на пусковую"
+    }
+
+    //проверяем не надо ли пускаться
+    if(tempRes == 1) {
+        if(_IQabs(load_s32(ramPnt, progPnt->Pnt_Fref)) < load_s32(ramPnt, progPnt->Pnt_AccFhold)){
+        	loc.flag.bit.AlrmFref = 1;
+        	if(load_s32(ramPnt, progPnt->Pnt_Fout) == 0){
+        		tempFreeze = 1;  //Морозим генератор темпа пока частота задания не будет выше частоты пуска
+        	}
+        }
+        else{
+        	loc.flag.bit.AlrmFref = 0;
+        }
+
+        sPnt->StateGT.Reset = 0;
+        if(!tempFreeze) {
+            sPnt->StateGT.Freeze = 0;
+            if(sPnt->State.Done == 0) {
+                if(sPnt->State.ToRefF) {                        //если надо прыгнуть на пусковую
+                    if(tempF_in >= 0.f) {                         //если задание положительное
+                        sPnt->OldF_out = tempResVal;
+                        sPnt->Fout = tempResVal;
+                    }
+                    else{                                      //если задание отрицательное
+                        sPnt->OldF_out = -tempResVal;
+                        sPnt->Fout = -tempResVal;
+                    }
+                    sPnt->State.ToRefF = 0;
+                    sPnt->State.Done = 1;
+                }
+                else{
+                    if(sPnt->State.ToZero){                    //если надо прыгнуть в 0
+
+                        sPnt->OldF_out = 0.f;
+                        sPnt->Fout = 0.f;
+
+                        sPnt->State.ToZero = 0;
+                        sPnt->State.Done = 1;
+                    }
+					else{                                    //иначе просто едем по кривой
+						if(((TYPEDRV_ACIMFOC&(1<<mPnt3->DriveType)) == 0)||(mPnt28->FlagState.bit.vPrUp == 1)){ //!!!GoncharovKV ждем роста потока в векторе для АД
+							if(sPnt->CurTime < sPnt->TfupOld){
+							    switch(tempType){
+							    case 0:
+							        //*********************************************************************************
+							        //         Вычисление приращения для линейного темпа
+							        //*********************************************************************************
+							        sPnt->Fcalc = sPnt->LinKoefK * sPnt->CurTime;
+								    break;
+								case 1:
+									//*********************************************************************************
+									//         Вычисление приращения для S-образного темпа
+									//*********************************************************************************
+									if(sPnt->State.ToUp) {
+									    TlinDn = sPnt->TlinDn;
+									    TlinUp = sPnt->TlinUp1;
+									}else{
+									    TlinDn = sPnt->TlinDn3;
+									    TlinUp = sPnt->TlinUp2;
+									}
+									if(sPnt->CurTime < TlinDn) {
+									    if(sPnt->State.ToUp) {
+									        sPnt->Fcalc = (sPnt->KoefA * sPnt->CurTime * sPnt->CurTime * sPnt->CurTime)
+									                      + (sPnt->KoefB * sPnt->CurTime * sPnt->CurTime);
+									    }else{
+									        sPnt->Fcalc = (sPnt->KoefA_3 * sPnt->CurTime * sPnt->CurTime * sPnt->CurTime)
+									                      + (sPnt->KoefB_3 * sPnt->CurTime * sPnt->CurTime);
+									    }
+									}
+									else {
+									    if((sPnt->CurTime >= TlinDn) && (sPnt->CurTime <= TlinUp)) {
+									        if (sPnt->State.ToUp)
+									            sPnt->Fcalc = sPnt->KoefK * sPnt->CurTime + sPnt->KoefBLin;
+									        else
+									            sPnt->Fcalc = sPnt->KoefK_3 * sPnt->CurTime + sPnt->KoefBLin_3;
+									    }
+									    else {
+									        f32 timeTemp;
+									        f32 freqTemp;
+									        timeTemp = sPnt->TfupOld - sPnt->CurTime;
+									        if(sPnt->State.ToUp) {
+									            freqTemp = sPnt->tempFin - sPnt->OldF_out;
+									            sPnt->Fcalc =  freqTemp - ((sPnt->KoefA_1 * timeTemp * timeTemp * timeTemp)
+									                                   + (sPnt->KoefB_1 * timeTemp * timeTemp));
+									        }
+									        else {
+									            freqTemp = sPnt->OldF_out - sPnt->tempFin;
+									            sPnt->Fcalc =  freqTemp - ((sPnt->KoefA_2 * timeTemp * timeTemp * timeTemp)
+									                                   + (sPnt->KoefB_2 * timeTemp * timeTemp));
+									        }
+									    }
+								    }
+								    break;
+								case 2:
+									sPnt->Fcalc =  sPnt->ParKoefK * (sPnt->CurTime * sPnt->CurTime);    			//U-образная кривая генератора темпа
+									break;
+								default:
+								    sPnt->Fcalc = 0.f;
+								    break ;
+								}
+								sPnt->CurTime += FLOAT_TIME_CALL_MICRO;
+
+							    //*********************************************************************************
+							    //         Вычисление частоты
+							    //*********************************************************************************
+							    if(sPnt->State.ToUp){
+							        sPnt->Fout = sPnt->OldF_out + sPnt->Fcalc;
+							    }
+							    else sPnt->Fout = sPnt->OldF_out - sPnt->Fcalc;
+							}
+							else {                                    //если вышли на частоту
+							    sPnt->OldF_out	 = sPnt->tempFin;
+							    sPnt->Fout		 = sPnt->tempFin;
+							    sPnt->State.Done = 1;
+							    if(sPnt->State.Revers){
+							        sPnt->StateGT.ReversHold = 1;
+							        sPnt->uFrefOld			 = utempFin - 1;
+							        sPnt->StateGT.RevCur	 = 0;
+							        sPnt->StateGT.RevRef	 = 0;
+							        sPnt->State.Revers		 = 0;
+							    }
+							    sPnt->StateGT.Dwn		= 0;
+							    sPnt->StateGT.Up		= 0;
+							    sPnt->StateGT.EqRefVal  = 1;
+							    sPnt->StateGT.PickUpWork = 0;
+							}
+						}
+                    }
+                }
+            }
+        }
+        else {
+            sPnt->StateGT.Freeze = 1;
+        }
+    }
+    else if(loc.flag.bit.PWM_Off || loc.flag.bit.Stop_DC){ //Отключен ШИМ или происходит торможение постоянным током
+        sPnt->StateGT.Reset    = 1;
+        sPnt->StateGT.EqRefVal = 1;
+    	sPnt->StateGT.flazhok  = 1;
+        sPnt->CurTime          = 0.f;
+        sPnt->Fout             = 0;
+        sPnt->OldF_out         = 0;
+        sPnt->uFrSOld          = 0;
+        sPnt->uFrefOld         = 0;
+        sPnt->State.all        = 0;
+        sPnt->State.Done       = 1;
+    	sPnt->Tpause 		   = 0;
+    	loc.flag.bit.AlrmFref  = 0;
+	}
+	else if(loc.flag.bit.PickUpOn){
+		sPnt->uFrefOld         = load_s32(ramPnt, progPnt->Pnt_F_PU); //считываем частоту с модуля подхвата
+        f_PU = _IQtoF(sPnt->uFrefOld);     // Подхват
+        sPnt->StateGT.Reset    = 1;
+        sPnt->StateGT.EqRefVal = 1;
+		sPnt->StateGT.EqResVal = 1;
+    	sPnt->StateGT.flazhok  = 1;
+    	sPnt->StateGT.PickUpWork = 1;
+        sPnt->CurTime          = 0.f;
+        sPnt->Fout             = f_PU;           // было = 0.f
+        sPnt->OldF_out         = f_PU;           // было = 0.f
+        sPnt->F_PU             = f_PU;
+        sPnt->uFrSOld          = utempFrSOld;
+        sPnt->State.all        = 0;
+        sPnt->State.Done       = 1;
+    	sPnt->Tpause 		   = 0;
+		sPnt->TfixFpusk        = 0;
+		tempFreeze             = 0;
+		sPnt->State.ToRefF     = 1;
+    	loc.flag.bit.AlrmFref  = 0;
+    }
+
+    if((sPnt->State.NeedZero == 1) && (sPnt->State.Done == 1)) {        //если задание было 0
+        sPnt->State.NeedZero = 0;                                       //то после приезда на пусковую
+        sPnt->State.Done = 0;                                           //прыгаем в 0
+        sPnt->State.ToZero = 1;
+    }
+	
+	if(ZerTime){
+	    defBitMicro(ramPnt, progPnt->Pnt_Dwn, testBitMicro(ramPnt, progPnt->Pnt_DwnIn));
+		defBitMicro(ramPnt, progPnt->Pnt_Up, testBitMicro(ramPnt, progPnt->Pnt_UpIn));
+	}
+	else{
+	    defBitMicro(ramPnt, progPnt->Pnt_Dwn, ((sPnt->StateGT.Dwn == 1) && (tempRes == 1)));
+		defBitMicro(ramPnt, progPnt->Pnt_Up , ((sPnt->StateGT.Up  == 1) && (tempRes == 1)));
+	}
+	
+    if(sPnt->Fout == 0.f) {
+        sPnt->StateGT.RefZero = 1;
+        setBitMicro(ramPnt, progPnt->Pnt_ZerroFq);
+        if ((sPnt->Tpause <= 0) && (sPnt->State.EquZero == 0) && (tempRes == 1)&& (sPnt->StateGT.ReversHold == 1 )){
+            sPnt->Tpause = load_s16(ramPnt, progPnt->Pnt_CurlesTime) / INT_TIME_CALL_MICRO_mS;
+            sPnt->State.EquZero = 1;
+            sPnt->StateGT.ReversHold = 0;
+        }
+        //if (tempResVal != 0){
+        //    sPnt->StateGT.EqResVal = 0;
+        //}else{
+        //    sPnt->StateGT.EqResVal = 1;
+        //}
+    }
+    else {
+        sPnt->StateGT.RefZero = 0;
+        sPnt->State.EquZero = 0;
+        clrBitMicro(ramPnt, progPnt->Pnt_ZerroFq);
+        sPnt->Tpause = 0;
+    }
+
+    if(((sPnt->Fout == tempResVal)||(sPnt->Fout == -tempResVal)) && (tempRes == 1)) {
+		//if(tempRes) {
+            setBitMicro(ramPnt, progPnt->Pnt_HldOnFq);
+		    sPnt->StateGT.EquRV = 1;
+            if ((sPnt->TfixFpusk <= 0) && (sPnt->StateGT.EqResVal == 0)){
+                sPnt->TfixFpusk = load_s16(ramPnt, progPnt->Pnt_AccThold) * (K_TIME_CALL_MICRO_TAKT / 10);
+                sPnt->StateGT.EqResVal = 1;
+			    sPnt->StateGT.Freeze = 1;
+            }
+		//}
+    }
+    else {
+        sPnt->StateGT.EqResVal = 0;
+        clrBitMicro(ramPnt, progPnt->Pnt_HldOnFq);
+		sPnt->StateGT.EquRV = 0;
+        sPnt->TfixFpusk = 0;
+    }
+
+	save_s32(ramPnt, progPnt->Pnt_Fout, _IQ(sPnt->Fout));
+    save_s16(ramPnt, progPnt->Pnt_GTstate, sPnt->StateGT.all);
+
+  	defBitMicro(ramPnt, progPnt->Pnt_AlrmFref, loc.flag.bit.AlrmFref);
+    
+    return &progPnt->Pnt_End;
+};
+#endif
+//********************************************************
+#ifdef    GET_FUNC_TABL_OPIS
+const char TblFuncTEMP_LSU_2_1[34]={
+        S32_PIN_TYPE | INPUT_PIN_MODE,     // 1  Fref        //Pnt_IN
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     // 2  UpIn
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     // 3  DwnIn
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     // 4  ZerTime
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     // 5  PickUpEn
+        S16_PIN_TYPE | INPUT_PIN_MODE,     // 6  GTtype      //Pnt_Type
+        S16_PIN_TYPE | INPUT_PIN_MODE,     // 7  TimeScale   //Pnt_TimeScale
+        S32_PIN_TYPE | INPUT_PIN_MODE,     // 8  Fmax        //Pnt_FrS
+        S16_PIN_TYPE | INPUT_PIN_MODE,     // 9  AccTime     //Pnt_TimeUp
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //10  DecTime     //Pnt_TimeDw
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //11  Stype       //Pnt_t2
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //12  tA1
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //13  tA2
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //14  tA3
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //15  tA4
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //16  AccFhld     //Pnt_ResVal
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //17  AccThld     //Pnt_TfixFpusk
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //18  DecFhld
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //19  DecThld
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //20  CurlesTime  //Pnt_Tpause
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //21  F_PU
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //22  ResByPWM
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //23  ResByDC
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //24  Freeze1     //Pnt_Freeze
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //25  Freeze2
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //26  AlrmFref
+        BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //27  HldOnDel    //Pnt_Fp_delay
+        S16_PIN_TYPE | OUTPUT_PIN_MODE,    //28  Format
+        BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //29  HldOnFq     //Pnt_EquRV
+        BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //30  ZerroFq     //Pnt_EqZero
+        S16_PIN_TYPE | OUTPUT_PIN_MODE,    //31  GTstate     //Pnt_Status
+        BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //32  Dwn
+        BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //33  Up
+        S32_PIN_TYPE | OUTPUT_PIN_MODE     //34  Fout        //Pnt_Out
+};
+#endif
+//********************************************************
+#ifdef    GET_FUNC_OPIS
+//SymbolName,  Prefix,  typePin, FuncPnt, SizeOfState, SizeOfNvState, ExeLogicBlock
+OpisFuncBlock("TEMP_LSU_2", "DA", TblFuncTEMP_LSU_2_1, FuncTEMP_LSU_2_1, sizeof(TblFuncTEMP_LSU_2_1), sizeof(Temp_koef_type), 0, 1),
+#endif
+//********************************************************
+#ifdef    GET_FUNC_PNT
+    (pFuncMicro_type)FuncTEMP_LSU_2_1,
+#endif
+//********************************************************

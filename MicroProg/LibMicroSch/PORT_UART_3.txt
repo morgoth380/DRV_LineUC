@@ -1,0 +1,34 @@
+Library File Name:	 D:\Install\Pcad\P-CAD_2006_LIB\MY_LIB\PORT_UART_3.lib
+Number of Components:	 38
+Component List:	 AUTOVENTIL_V2, BLINK_BN, BUS_MATRIX_32_64, COMMANDCOM2, DELAY_FREQ, DERATING_CONTROL, DIN_2U64, DISKR_FUNC_V3, DISKR_FUNC_V3_B, DISKR_FUNC_V4, DRV_UD, DRV_UD_2, DRV_V4, DRV_V5, DTC_BLOCK, ENCO_PHASING_BLOCK, EXT_BLOCKS_PARAMS, FAST_DIN, GET_CRC_PO_V3, LIFT_CMD_V2, LIFT_CMD_V3, MACROS_TYPE_CONTROL, MASTER_SLAVE, PCP_BLOCK, PERIF_V2, PID_REF_CONVERT, PLC_AT24, PORT_UART_3, PUMP_CMD, PUSKREADY_2, RAMP_CTRL, RAMP_CTRL_MOD, ROD_PUMP, S16_S16_TO_S32, SEL_REF_V2, SLIP_COMP, TEMP_LSU_2, UARTEX1
+
+ 
+Component Name:	 DERATING_CONTROL
+RefDes Prefix:	 DA
+Number of Pins:	 15
+Homogeneous:	 True
+Gate Numbering:	 Alphabetic
+Number of Gates:	 1
+
+	Pin Des	Gate #	Sym Pin #	Pin Name	Gate Eq	Pin Eq	Elec. Type
+1	1	1	1	TempIGBT			Input
+2	2	1	2	TempBoard			Input
+3	3	1	3	Ifull			Input
+4	4	1	4	AlarmOVL			Input
+5	5	1	5	Fpwm			Input
+6	6	1	6	FpwmDC			Input
+7	7	1	7	EnFpwmDC			Input
+8	8	1	8	TstartDR			Input
+9	9	1	9	TendDR			Input
+10	10	1	10	FpwmMinDR			Input
+11	11	1	11	FpwmMinDR			Input
+12	12	1	12	FpwmStepDR			Input
+13	13	1	13	ModeDR			Input
+14	14	1	14	TekFpwm			Output
+15	15	1	15	WarnWorkDR			Output
+
+Attached Symbol:	 DERATING_CONTROL
+Number of Pins:	 15
+
+ 
+

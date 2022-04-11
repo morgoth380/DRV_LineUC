@@ -1,0 +1,61 @@
+Library File Name:	 D:\CP24\DRV_LineUC\MicroProg\LibMicro\AT24Po.lib
+Number of Components:	 57
+Component List:	 AIN_SCALE2, APV1, AUTOVENTIL_V2, BASE_CALC, BIT16_TO_U16, CHARGE_UD, CONSUMP, DIN_2U64, DIN_UP_DOWN, DISKR_FUNC, DISKR_FUNC_V4, DRV_CMD, DRV_CMD_V2, DRV_UD, DRV_UD_2, DRV_V2, DRV_V3, EVAC_V2, FAIL_COMMON, FAIL_COMMON_V2, GET_CRC_PO, KX+B_32, KX+B_32_2, LED_CONTROL, LED_RUN, LIFT_CMD, LIFT_CMD_V2, LOAD_LOSS, LOGER, MUX16, MUX24, MUX2X2, MUX8_2, PERIF_NVSA_V2, PERIF_V2, PICKUP_2, PORT_UART_3, POWER_ON_PUSK, PUMP_CMD, PUSK_READY, RAMP_CTRL, READ_SCADA_GROUP, REF_CONTROL, REVERS_CONTROL, RRRR, RTC, RUN_LED, RW_GROUP_PRM, SCALE2, SEL_REF_V2, TEMP, TEMP_2, TEMP_LSU_2, TIME_CONTROL, TORMOZ_V2, UF5_F2S, WR_GROUP
+
+ 
+Component Name:	 RW_GROUP_PRM
+RefDes Prefix:	 DD
+Number of Pins:	 42
+Homogeneous:	 True
+Gate Numbering:	 Alphabetic
+Number of Gates:	 1
+
+	Pin Des	Gate #	Sym Pin #	Pin Name	Gate Eq	Pin Eq	Elec. Type
+1	1	1	1	RD_WR			Input
+2	2	1	2	Enable			Input
+3	3	1	3	Prm1			Input
+4	4	1	4	Prm2			Input
+5	5	1	5	Prm3			Input
+6	6	1	6	Prm4			Input
+7	7	1	7	Prm5			Input
+8	8	1	8	Prm6			Input
+9	9	1	9	Prm7			Input
+10	10	1	10	Prm8			Input
+11	11	1	11	Prm9			Input
+12	12	1	12	Prm10			Input
+13	13	1	13	Prm11			Input
+14	14	1	14	Prm12			Input
+15	15	1	15	Prm13			Input
+16	16	1	16	Prm14			Input
+17	17	1	17	Prm15			Input
+18	18	1	18	Prm16			Input
+19	19	1	19	Prm17			Input
+20	20	1	20	Prm18			Input
+21	21	1	21	Prm19			Input
+22	22	1	22	Prm20			Input
+23	23	1	23	Val1			Output
+24	24	1	24	Val2			Output
+25	25	1	25	Val3			Output
+26	26	1	26	Val4			Output
+27	27	1	27	Val5			Output
+28	28	1	28	Val6			Output
+29	29	1	29	Val7			Output
+30	30	1	30	Val8			Output
+31	31	1	31	Val9			Output
+32	32	1	32	Val10			Output
+33	33	1	33	Val11			Output
+34	34	1	34	Val12			Output
+35	35	1	35	Val13			Output
+36	36	1	36	Val14			Output
+37	37	1	37	Val15			Output
+38	38	1	38	Val16			Output
+39	39	1	39	Val17			Output
+40	40	1	40	Val18			Output
+41	41	1	41	Val19			Output
+42	42	1	42	Val20			Output
+
+Attached Symbol:	 RW_GROUP_PRM
+Number of Pins:	 42
+
+ 
+

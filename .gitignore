@@ -1,52 +1,78 @@
-# Prerequisites
-*.d
+/EWARM/AT24_Line_UC/Obj/*.o
+/EWARM/AT24_Line_UC/Exe/*.hex
+/EWARM/AT24_Line_UC/Exe/*.out
+/EWARM/AT24_Line_UC/Exe/AT24_Line_UC.sim
+/EWARM/AT24_Line_UC/Obj/*.pbi
+/EWARM/AT24_Line_UC/Obj/*.xcl
+/MicroProg/AT24_EMU_Concerto/AT24_emu.vcproj.TRIOL.a.pavlenko.user
+/MicroProg/AT24_EMU_Concerto/AT24_emu.vcproj.ZVERDVD-2B547B1.Zver.user
+/MicroProg/AT24_EMU_Concerto/Debug/*.obj
+/MicroProg/LibMicroProg/FuncBlock/diskr_func_V4 — копия файла Суходольского.h_
+/MicroProg/LibMicroSch/AT_24_prog-0000.dtu
+/MicroProg/LibMicroSch/AT_24_prog-111.dtu
+/MicroProg/LibMicroSch/*.dtu
+/EWARM/settings/*.crun  
+/EWARM/settings/*.dbgdt  
+/EWARM/settings/*.cspy  
+/EWARM/settings/*.cspy.*  
+/EWARM/settings/*.xcl  
+/EWARM/settings/*.dni  
+/EWARM/settings/*.wsdt  
+/EWARM/settings/*.wspos  
+/MicroProg/LibMicroSch/*.mem
+**/settings/*.crun  
+**/settings/*.dbgdt  
+**/settings/*.cspy  
+**/settings/*.cspy.*  
+**/settings/*.xcl  
+**/settings/*.dni  
+**/settings/*.wsdt  
+**/settings/*.wspos 
 
-# Object files
-*.o
-*.ko
+/EWARM/AT24_Line_UC/Obj/*.browse
+/EWARM/AT24_Line_UC/Obj/*.pbd
+/EWARM/AT24_Line_UC/List/*.map
+/EWARM/AT24_Line_UC/List/AT24_Line_UC.map
+/EWARM/AT24_Line_UC/Obj/AT24_Line_UC.pbd
+/EWARM/AT24_Line_UC/Obj/AT24_Line_UC.pbd.browse
+/EWARM/AT24_Line_UC/Obj/AT24_Line_UC.pbd.linf
+/EWARM/AT24_Line_UC/Obj/AT24_Line_UC.pbw
+/MicroProg/AT24_EMU_Concerto/*.user
+/MicroProg/LibMicroSch/TexPO_53_020.ini
+/MicroProg/LibMicroSch/AT_24_prog_TMS_RAM.h
+/MicroProg/LibMicroSch/AT_24_prog_TMS_NVRAM.h
+/MicroProg/LibMicroSch/AT_24_prog_TMS_Mem.h
+/MicroProg/LibMicroSch/AT_24_prog_TMS.mem
+/MicroProg/LibMicroSch/AT_24_prog_Pult_Mem.h
+/MicroProg/LibMicroSch/AT_24_prog_PultTMS_Mem.h
+/MicroProg/LibMicroSch/AT_24_prog_PultTMS.mem
+/MicroProg/LibMicroSch/AT_24_prog_NVRAM.h
+/MicroProg/LibMicroSch/AT_24_prog.sch.BAK
+/MicroProg/LibMicroSch/AT_24_prog.net
+/MicroProg/LibMicroSch/AT_24_prog.h
+/MicroProg/LibMicroSch/AT_24_prog.eco
+/MicroProg/LibMicroSch/AT24_emu.dll
+/MicroProg/LibMicroSch/AT24_emu.exp
+/MicroProg/LibMicroSch/AT24_emu.ilk
+/MicroProg/LibMicroSch/AT24_emu.lib
+/MicroProg/LibMicroSch/AT24_emu.pdb
+/MicroProg/AT24_EMU_Concerto/Debug/BuildLog.htm
+/MicroProg/AT24_EMU_Concerto/Debug/vc80.idb
+/MicroProg/AT24_EMU_Concerto/Debug/vc80.pdb
+/EWARM/AT24_Line_UC.dep
+/EWARM/settings/*.bat
+/EWARM/settings/AT24_Line_UC.AT24_Line_UC.cspy.ps1
+/EWARM/settings/*.xcl
+/EWARM/settings/*.xcl
+/MicroProg/LibMicroSch/*.bin
+/MicroProg/LibMicroSch/TexPO.ini
+/EWARM/settings/AT24_Line_UC.reggroups
+/EWARM/AT24_Line_UC/Obj/AT24_Line_UC.pbd.tmp
 *.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
+*.bin
+*.log
+*.htm
+*.ncb
 *.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+*.idb
+*.user

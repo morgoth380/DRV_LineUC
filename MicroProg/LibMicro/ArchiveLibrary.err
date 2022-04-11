@@ -1,0 +1,660 @@
+Archive Library Log
+
+======================================================================
+
+Errors:
+
+Cannot copy component FAIL_COMMON from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪ
+ЕДИНЁННАЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11
+\AT24_new\LibMicro\cmm2.lib.  The component in the library does not match the co
+mponent in the design.  The component in the library does not match the componen
+t in the design.  The number of pins are not equal.  Either force-update the par
+t in the design, or use the Library Manager to change the component in the libra
+ry.  Either force-update the component in the design or use Library Manager to c
+hange the component in the library.
+
+A Component matching FAIL_COMMON was not found in any of the open libraries.
+
+Component GRP was placed from library NEW.LIB.  Library NEW.LIB is not one of th
+e open libraries.  Open libraries will be searched for component GRP.
+
+Component GRP was not found in any of the open libraries.
+
+Component DRV_CMD_V2 was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT
+24PO.LIB is not one of the open libraries.  Open libraries will be searched for 
+component DRV_CMD_V2.
+
+Component DRV_CMD_V2 was not found in any of the open libraries.
+
+Component CONTROL_V2 was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT
+24PO.LIB is not one of the open libraries.  Open libraries will be searched for 
+component CONTROL_V2.
+
+Component CONTROL_V2 was not found in any of the open libraries.
+
+Component LIFT_CMD_V2 was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕ
+ДИНЁННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\A
+T24PO.LIB is not one of the open libraries.  Open libraries will be searched for
+ component LIFT_CMD_V2.
+
+Component LIFT_CMD_V2 was not found in any of the open libraries.
+
+Component CURRENT_IMBALANCE was placed from library E:\000_PROJECT\000_АТ24\СХЕМ
+А_ОБЪЕДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB.  Library E:\000_PROJECT\000_АТ24\СХ
+ЕМА_ОБЪЕДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB is not one of the open libraries. 
+ Open libraries will be searched for component CURRENT_IMBALANCE.
+
+Component CURRENT_IMBALANCE was not found in any of the open libraries.
+
+Component TORMOZ_V2 was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИ
+НЁННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT2
+4PO.LIB is not one of the open libraries.  Open libraries will be searched for c
+omponent TORMOZ_V2.
+
+Component TORMOZ_V2 was not found in any of the open libraries.
+
+Component JOBTIME was placed from library PARAMFAZ.LIB.  Library PARAMFAZ.LIB is
+ not one of the open libraries.  Open libraries will be searched for component J
+OBTIME.
+
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    1
+
+Archive Library Log
+
+======================================================================
+
+Component ATRIBUT was placed from library NEW.LIB.  Library NEW.LIB is not one o
+f the open libraries.  Open libraries will be searched for component ATRIBUT.
+
+Component ATRIBUT was not found in any of the open libraries.
+
+Component AIN_SCALE3 was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT
+24PO.LIB is not one of the open libraries.  Open libraries will be searched for 
+component AIN_SCALE3.
+
+Component AIN_SCALE3 was not found in any of the open libraries.
+
+Cannot copy component TEMP_LSU_2 from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕ
+ДИНЁННАЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\
+AT24_new\LibMicro\cmm2.lib.  The component in the library does not match the com
+ponent in the design.  The component in the library does not match the component
+ in the design.  The number of pins are not equal.  Either force-update the part
+ in the design, or use the Library Manager to change the component in the librar
+y.  Either force-update the component in the design or use Library Manager to ch
+ange the component in the library.
+
+A Component matching TEMP_LSU_2 was not found in any of the open libraries.
+
+Component EVAC_V2 was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT24P
+O.LIB is not one of the open libraries.  Open libraries will be searched for com
+ponent EVAC_V2.
+
+Component EVAC_V2 was not found in any of the open libraries.
+
+Component UD_ACT_VAR was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT
+24PO.LIB is not one of the open libraries.  Open libraries will be searched for 
+component UD_ACT_VAR.
+
+Component UD_ACT_VAR was not found in any of the open libraries.
+
+Component BASE_CALC was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИ
+НЁННАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT2
+4PO.LIB is not one of the open libraries.  Open libraries will be searched for c
+omponent BASE_CALC.
+
+Component BASE_CALC was not found in any of the open libraries.
+
+Component PORT_UART_2 was placed from library PERIF2.LIB.  Library PERIF2.LIB is
+ not one of the open libraries.  Open libraries will be searched for component P
+ORT_UART_2.
+
+Component PORT_UART_2 was not found in any of the open libraries.
+
+Component DRV_UD was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT24PO
+.LIB is not one of the open libraries.  Open libraries will be searched for comp
+onent DRV_UD.
+
+Component DRV_UD was not found in any of the open libraries.
+
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    2
+
+Archive Library Log
+
+======================================================================
+
+Component ECONOM was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24PO.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\AT24PO
+.LIB is not one of the open libraries.  Open libraries will be searched for comp
+onent ECONOM.
+
+Component ECONOM was not found in any of the open libraries.
+
+Component JRN was placed from library PARAMFAZ.LIB.  Library PARAMFAZ.LIB is not
+ one of the open libraries.  Open libraries will be searched for component JRN.
+
+Component JRN was not found in any of the open libraries.
+
+Component UNDERLOAD was placed from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИ
+НЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB.  Library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕ
+ДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB is not one of the open libraries.  Open li
+braries will be searched for component UNDERLOAD.
+
+Component UNDERLOAD was not found in any of the open libraries.
+
+Component TPM was placed from library PARAMFAZ.LIB.  Library PARAMFAZ.LIB is not
+ one of the open libraries.  Open libraries will be searched for component TPM.
+
+Total error messages: 38
+
+Information:
+
+Component UST copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component TYPE_S32 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component CONST copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_1
+1\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая
+_11\AT24_new\LibMicro\cmm2.lib.
+
+Component OR-4 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component TEXT_VAL copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component PUSK_READY copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_
+new\LibMicro\cmm2.lib.
+
+Component MGRP copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component UST_TEXT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    3
+
+Archive Library Log
+
+======================================================================
+
+Component REVERS_CONTROL copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\A
+T24_new\LibMicro\cmm2.lib.
+
+Component TEK_TEXT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component POWER_ON_PUSK copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИ
+НЁННАЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT
+24_new\LibMicro\cmm2.lib.
+
+Component TYPE_S16_TO_BIT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕ
+ДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_об
+ъединённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component UST_FORMAT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component GET_CRC_PO copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component PAROLES copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component TEK copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component DISKR_FUNC copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_
+new\LibMicro\cmm2.lib.
+
+Component OR-3 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component UST_4BYTE copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MB_0X05 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component OR-2 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component UST_LIM copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    4
+
+Archive Library Log
+
+======================================================================
+
+Component RES_CAB copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component TEK_FORMAT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component CMP_5 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_1
+1\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая
+_11\AT24_new\LibMicro\cmm2.lib.
+
+Component APV1 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component TYPE_S16 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component PULSE_RISE copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component TYPE_BIT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component ADD copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component TYPE_FLOAT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component USTAB copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_1
+1\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая
+_11\AT24_new\LibMicro\cmm2.lib.
+
+Component LOCAL_APV copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component CMH copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component TEK_4BYTE copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component PICKUP_2 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_ne
+w\LibMicro\cmm2.lib.
+
+Component RTC copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    5
+
+Archive Library Log
+
+======================================================================
+
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component AND-2 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_1
+1\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая
+_11\AT24_new\LibMicro\cmm2.lib.
+
+Component TIMER_1 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component DC4 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component PULSE_RISE_PRM copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объе
+динённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component JOBTIME copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component TRANZIT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component NOT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component AUTOADJ_PID copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component RS-TRIGGER-OR copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИ
+НЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объе
+динённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component UST_FORMAT_LIM copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объе
+динённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component FB_FUNC copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component FREQ_PWR_SIMULATOR copied from library E:\000_PROJECT\000_АТ24\СХЕМА_О
+БЪЕДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема
+_объединённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component FIRE_MODE copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component UF5_F2S copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_new
+\LibMicro\cmm2.lib.
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    6
+
+Archive Library Log
+
+======================================================================
+
+
+Component FLOW_COMP copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component DIN_2U64 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_ne
+w\LibMicro\cmm2.lib.
+
+Component FACTORY_SET copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MK_TIME copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component FREQ_FORBIDDEN copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объе
+динённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component TIMER_3 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component BIT8_TO_U16 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component SEL_REF copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component WARNINGS copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MB_0X05_VAL copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component BASE16 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_
+11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая
+_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MASTER_SET_PUMP copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕ
+ДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_об
+ъединённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MACROS_TYPE_CONTROL copied from library E:\000_PROJECT\000_АТ24\СХЕМА_
+ОБЪЕДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема
+_объединённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MACROS_LIFT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    7
+
+Archive Library Log
+
+======================================================================
+
+Component MACROS_TYPE_TASK copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪ
+ЕДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_
+объединённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MASTER_SET_LIFT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕ
+ДИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_об
+ъединённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MUX24 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_1
+1\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_new\L
+ibMicro\cmm2.lib.
+
+Component CURR_CONTR copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component BIT16_TO_U16 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИН
+ЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component DIN_UP_DOWN copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component LOGGER1 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ
+_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component NAMEFUNC16 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component ABS copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component KX+B copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component KX+B_32_2 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_n
+ew\LibMicro\cmm2.lib.
+
+Component RS-TRIGGER copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component CMP_SELECT copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component KX+B_SCALE copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    8
+
+Archive Library Log
+
+======================================================================
+
+Component AIN_SCALE2 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+НАЯ_11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_
+new\LibMicro\cmm2.lib.
+
+Component SS_PARAMS copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component PID_IQ copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_
+11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая
+_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MUX4 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component MUX8_2 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_
+11\AT24PO.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_11\AT24_new\
+LibMicro\cmm2.lib.
+
+Component MIN_MAX_2 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component FB_COMBO copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННА
+Я_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённ
+ая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component DEBUG_SYM copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component TPM copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11\
+AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component S16_S16_TO_S16 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объе
+динённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component U16_TO_BIT4 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁ
+ННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объеди
+нённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Component MUX8 copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_11
+\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая_
+11\AT24_new\LibMicro\cmm2.lib.
+
+Component TREND copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁННАЯ_1
+1\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединённая
+_11\AT24_new\LibMicro\cmm2.lib.
+
+Component ELCOUNTER copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component PROFIDRIVE copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁН
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page    9
+
+Archive Library Log
+
+======================================================================
+
+НАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component PZDI_PZDO copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕДИНЁНН
+АЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объединё
+нная_11\AT24_new\LibMicro\cmm2.lib.
+
+Component ACTIVEPROTOCOL copied from library E:\000_PROJECT\000_АТ24\СХЕМА_ОБЪЕД
+ИНЁННАЯ_11\AT24_NEW\LIBMICRO\GUI.LIB to library E:\000_Project\000_АТ24\Схема_объе
+динённая_11\AT24_new\LibMicro\cmm2.lib.
+
+Total informational messages: 96
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+
+14-Oct-15  19:37                                            Page   10
+

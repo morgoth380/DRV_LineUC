@@ -1,0 +1,878 @@
+#ifdef   GET_FUNC_CODE
+
+#include "MakeOpis_at24.h"
+ 
+#include "Tsk_MasterUart.h"
+#include "Global_include.h"         // Include header for IQmath library
+
+typedef struct{
+    u16  Pnt_Nfunc;
+    u16  Pnt_State;
+    u16  Pnt_nvState;
+    u16  Pnt_INPUT1;                       //1  K_PROPOR
+    u16  Pnt_INPUT2;                       //2  K_INTEGR
+    u16  Pnt_INPUT3;                       //3  режим U0 
+    u16  Pnt_INPUT4;                        //4 контроль аварии обмена
+    u16  Pnt_INPUT5;                       //5   
+    u16  Pnt_INPUT6;                      //6  Fzad
+    u16  Pnt_INPUT7;                       //7 K_PROPOR момент
+    u16  Pnt_INPUT8;                       //8  K_INTEGR момент
+    u16  Pnt_INPUT9;                       //9  ограничение момента  в pu
+    u16  Pnt_INPUT10;                      //10 
+	u16  Pnt_INPUT11;                      //11  
+    u16  Pnt_INPUT12;                       //12
+	u16  Pnt_INPUT13;                       //13
+    u16  Pnt_INPUT14;                       //14
+	u16  Pnt_INPUT15;                       //15
+	u16  Pnt_INPUT16;                       //16
+	u16  Pnt_INPUT17;                       //17
+    u16  Pnt_INPUT18;                       //18
+	u16  Pnt_INPUT19;                       //19
+	u16  Pnt_INPUT20;                       //20
+
+    u16  Pnt_OUTPUT1;                      //21  RELE master-slave
+    u16  Pnt_OUTPUT2;                      //22  
+    u16  Pnt_OUTPUT3;                      //23
+    u16  Pnt_OUTPUT4;                      //24   
+	u16  Pnt_OUTPUT5;                      //25  
+    u16  Pnt_OUTPUT6;                      //26  
+    u16  Pnt_OUTPUT7;                      //27 выбегчастотный 
+    u16  Pnt_OUTPUT8;                      //28  время выбега 
+	u16  Pnt_OUTPUT9;                      //29  
+    u16  Pnt_OUTPUT10;                      //30  
+    u16  Pnt_OUTPUT11;                      //31
+    u16  Pnt_OUTPUT12;                      //32  
+    u16  Pnt_End;
+}FuncUNIT3_type;
+
+
+typedef struct 
+{                    
+		  u16 pr_PHase_enable;
+	 	u16 count_Pause_start;  //пауза при старте
+		u16 count_Pause_phase;
+			u16 count_temp_phase;
+	 	u16  temp_phase_old ;
+	 	u16	temp_phase;  
+		u16 Type_Break;
+		u16 Time_Vubeg;
+	//	u16 flag_regim; //флаг наличия смены режима
+	//	u16 countImpuls; //количество импульсов для смены режима
+		u16 Regim_Privod;  // режим при включении
+	 //	u16 Bit_ChangeDI; //смена DI для смены режима
+	//	u16 pr_count;
+	//	u16 count_ChangeDI; //счетчик числа смена DI для смены режима
+		f32  Koeff_Pr;
+		u16 Type_Break_ZIP;
+		u16 Time_Vubeg_ZIP;
+ 
+}PICONTROL_State_type; 
+
+ typedef struct{
+    
+   u16     Regim_Privod;
+   f32     Koeff_Pr_Torque;
+
+    u16     Type_Break;
+     u16     Time_Vubeg;
+}nvState_UNIT3_MODE_type;
+
+//#define  COUNT_IMP_ALONE 3
+//#define  COUNT_IMP_MASTER 7
+//#define	 COUNT_IMP_SLAVE 10
+//#define  COUNT_IMP_NEUPR 13
+
+
+#define Torque_Little 1
+#define Torque_Big 2
+
+ #define STOP_FREQ   1
+ #define STOP_VUBEG  0
+/** Структура данных ПИ-регулятора.  Она содержит настройки 
+(коэффициент усиления, интегральная часть, а также конечный делитель), 
+выходные пределы, и аккумулятор интегральной части. */
+
+/*===========================================================================*/
+// Преобразование int <-> float
+/*===========================================================================*/
+#define m1          ((f32)1.	)
+#define m10         ((f32)10.	)
+#define m100        ((f32)100.	)
+#define m1000       ((f32)1000.	)
+#define m10000      ((f32)10000.)
+
+#define d1          ((f32)1.    )
+#define d10         ((f32).1    )
+#define d100        ((f32).01   )
+#define d1000       ((f32).001  )
+#define d10000      ((f32).0001 )
+
+
+#define ModbusSlave   1
+#define  ModbusMaster 2
+
+    #define  REGIM_ALONE   0 /*0 - одиночный*/
+    #define  REGIM_MASTER  1 /*1 - master*/
+    #define  REGIM_SLAVE   2 /*2 - slave*/
+    #define  REGIM_NEUPR   3 /*3 - неуправляемый*/
+
+#define     nvSfUNIT3_MODE    (*(nvState_UNIT3_MODE_type*)0)
+/*===========================================================================*/
+// Преобразование из float32 в s16 с заданной точностью
+// передается коэфициент преобразования переменной
+/*===========================================================================*/
+extern s16 f2int(f32 data, f32 mf);
+/*===========================================================================*/
+// Преобразование из s16 в float32 с заданной точностью
+// передается коэфициент преобразования переменной
+/*===========================================================================*/
+extern f32 int2f(s16 data, f32 mf);
+
+extern int WRITE_TO_FRAM(unsigned int ADR, int DAN);
+ void CONTROL_PHASE(void);
+//********************************************************
+u16 *FuncUNIT3_1(FuncUNIT3_type *progPnt, u32 ramPnt)
+{ // _iq								tmpIQ;
+	u16   temp_regim,temp,mode;
+	
+   s16  temp_phase;
+	s16  temp_s16;
+	f32 fL,Koeff_Pr;
+    u16     Type_Break;
+    u16     Time_Vubeg;
+ //	_iq   Torrent_Real;//OUT_PI_REGULATOR,OUT_OLD,Ipartner,Iwork,delta;
+
+	nvState_UNIT3_MODE_type    *nvAdr, nvMem;
+   PICONTROL_State_type   *sPnt;
+
+     COMMONPARAMM3	*mPnt3;
+     nvMem.Regim_Privod = 0;
+	 nvMem.Koeff_Pr_Torque=0;
+	mPnt3	= &GlobalM3;
+    nvAdr = GetNvAdr(progPnt->Pnt_nvState, &nvSfUNIT3_MODE);
+  //  RdFramMicro(&nvMem, nvAdr, sizeof(nvState_UNIT3_MODE_type));
+
+//	if((sPnt->FazaOld<0)&&(GlobalC28.Faza_U.VoltageLog>=0))
+//	{
+ //		mPnt3->PERIOD=GlobalC28.count_PERIOD;//sPnt->count_PERIOD;
+
+
+	 GlobalM3.errorTimeoutCounter = GlobalMstSlv.errorTimeoutCounter;// (u16)GlobalM3.TorqBASE); //GlobalM3.Drive_STATE);   // Состояние приводаGlobalM3
+     GlobalM3.errorConnectCounter= GlobalMstSlv.errorConnectCounter;
+     GlobalM3.TrueConnectCounter= GlobalMstSlv.TrueConnectCounter;
+     sPnt = (PICONTROL_State_type *)(ramPnt + progPnt->Pnt_State);		// флажок завершения пуска
+  		if(flagIsFirstCall)
+			  {   // первое вхождение для установки нач условий
+				         RdFramMicro(&nvMem, nvAdr, sizeof(nvState_UNIT3_MODE_type));
+				 		  GlobalM3.Regim_Privod=nvMem.Regim_Privod;   // чтение из фрам состояния  при включении
+						  sPnt->Regim_Privod = GlobalM3.Regim_Privod; 
+						clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);// rele    = 1.0f; 
+                          save_s16(ramPnt,progPnt->Pnt_INPUT12,GlobalM3.Regim_Privod);
+   Type_Break=load_s16(ramPnt,progPnt->Pnt_INPUT18);
+     Time_Vubeg= load_s16(ramPnt,progPnt->Pnt_INPUT19);
+	
+                       //   sPnt->Type_Break=nvMem.Type_Break; //чтение из фрам вид торможения  при включении
+                       //   sPnt->Time_Vubeg=nvMem.Time_Vubeg;  //чтение из фрам время торможения	 при включении
+                        sPnt->count_Pause_start = 2 * K_TIME_CALL_MICRO_TAKT; //10sec
+						sPnt->pr_PHase_enable=0;
+						sPnt->count_Pause_phase=0;
+                          sPnt->Type_Break=Type_Break;
+                          sPnt->Time_Vubeg=Time_Vubeg;
+						  save_s16(ramPnt,progPnt->Pnt_INPUT18,Type_Break);
+						  save_s16(ramPnt,progPnt->Pnt_INPUT19,Time_Vubeg);
+				          save_s16(ramPnt,progPnt->Pnt_OUTPUT7,Type_Break);
+                          save_s16(ramPnt,progPnt->Pnt_OUTPUT8,Time_Vubeg);
+
+   if(GlobalM3.Regim_Privod==REGIM_ALONE||GlobalM3.Regim_Privod==REGIM_MASTER) //стал одиночный или мастер ,был слейв  увеличитить коэфф
+   {
+	   sPnt->Type_Break_ZIP=Type_Break;
+	   sPnt->Time_Vubeg_ZIP=Time_Vubeg;
+	 //   nvMem.Type_Break=Type_Break;
+	//    nvMem.Time_Vubeg=Time_Vubeg;
+	//    WrFramMicro(nvAdr, &nvMem, sizeof(nvState_UNIT3_MODE_type));
+
+   }
+                       Koeff_Pr =nvMem.Koeff_Pr_Torque; //чтение из фрам коэфф регулятора момента	 при включении
+                      sPnt->Koeff_Pr=Koeff_Pr;
+					  
+ 	       			  
+ 	       	 		  GlobalM3.FlagCommand.bit.BitWAitPhase =0;
+        			  GlobalM3.FlagCommand.bit.BitGotovWorkSVP=0;
+            //          GlobalM3.FlagCommand.bit.ChangeRegim=0;
+        			  
+					//  sPnt->Bit_ChangeDI=0;
+                    //  sPnt->count_ChangeDI=0;
+                     // sPnt->countREGIM_PRIEM=0;
+					 // sPnt->flag_regim=0;
+
+ 
+ 	       	     }
+
+ 
+    //  mPnt3->IndicatorParametr= load_s16(ramPnt, progPnt->Pnt_INPUT5);  //test- 0   1  c тех по    2 без момента
+//======внешняя авария
+  		if(GlobalM3.FlagCommand.bit.BitInput_AVARIA==1)
+  		 {setBitMicro(ramPnt, progPnt->Pnt_OUTPUT11);
+  		 }
+  		 else
+  		 {
+  		  clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT11);
+  		 }
+  //===================реле дублирование кулера
+if( mPnt3->Cooler_PWM==0)
+	{clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT2);// rele    = 1.0f;
+
+	}
+else
+	{setBitMicro(ramPnt, progPnt->Pnt_OUTPUT2);// rele 2  = 1.0f;
+
+	}
+//======база момента
+     // mPnt3->TorqBASE	= mPnt3->PowerBASE * mPnt3->Zp / (2*PI*_IQtoF(mPnt3->Wnom)*mPnt3->FreqBASE);
+//mPnt3->Pn
+           //=================ограничение момента  63 06
+       temp_s16	= load_s16(ramPnt, progPnt->Pnt_INPUT9); //ограничение момента
+	 	    fL=(f32)temp_s16/100.0;
+ mPnt3->TorqueBoard= _IQ(mPnt3->Torque_n/mPnt3->TorqBASE*fL) ;//номин момент в о
+
+//fL=0.8;
+
+		    mPnt3->TorqueMax =  mPnt3->TorqueBoard;
+//коэфф наблюдателя
+		    temp_s16= load_s16(ramPnt, progPnt->Pnt_INPUT2); //1  K_INTEGR
+	GlobalM3.KiFe =(f32)temp_s16*0.00001;
+	temp_s16 = load_s16(ramPnt, progPnt->Pnt_INPUT1);   //2  K_PROPOR
+	GlobalM3.KpFe =(f32)temp_s16*0.00001;
+// коэфф регулятора момента
+	temp_s16= load_s16(ramPnt, progPnt->Pnt_INPUT7); //  пропорц коэфф момента
+GlobalM3.Koeff_Pr_Torque=(f32)temp_s16*0.1;////int2f(load_s16(ramPnt, progPnt->Pnt_INPUT7), d10);
+temp_s16= load_s16(ramPnt, progPnt->Pnt_INPUT8); // интегр коэфф момента
+GlobalM3.Koeff_In_Torque=(f32)temp_s16*0.1;//int2f(load_s16(ramPnt, progPnt->Pnt_INPUT8), d10);
+
+
+ 	GlobalM3.FlagCommand.bit.BitEnableWaitVoltage=load_s16 (ramPnt, progPnt->Pnt_INPUT11);
+
+//==============изменение режима======================================   
+temp_s16=load_s16(ramPnt, progPnt->Pnt_INPUT12); 
+
+if(temp_s16!=sPnt->Regim_Privod) // режим поменялся
+{
+	if(GlobalM3.FlagCommand.bit.BitInput_ChangeDI==1) //мастер на линии уже есть
+	{
+		if((temp_s16==REGIM_MASTER)||(temp_s16==REGIM_ALONE))
+		{ save_s16(ramPnt,progPnt->Pnt_INPUT12,GlobalM3.Regim_Privod);
+		}
+		else
+		{  GlobalM3.Regim_Privod =  temp_s16;
+		}
+	}
+	else                                              //мастера на линии нет
+	{
+		GlobalM3.Regim_Privod =  temp_s16;
+	} 
+}
+ 
+ 
+if(GlobalM3.Regim_Privod!=sPnt->Regim_Privod) // режим поменялся
+{  
+	 Koeff_Pr=int2f(load_s16(ramPnt, progPnt->Pnt_INPUT7), d10);
+	if((GlobalM3.Regim_Privod==REGIM_SLAVE)&&(sPnt->Regim_Privod==REGIM_ALONE||sPnt->Regim_Privod==REGIM_MASTER))  //стал слейв ,был одиночный или мастер  уменьшить коэфф
+	 {
+ 	 
+           Koeff_Pr=Koeff_Pr/2; 
+	 }
+	 else if((sPnt->Regim_Privod==REGIM_SLAVE)&&(GlobalM3.Regim_Privod==REGIM_ALONE||GlobalM3.Regim_Privod==REGIM_MASTER)) //стал одиночный или мастер ,был слейв  увеличитить коэфф
+	 {	  Koeff_Pr=Koeff_Pr*2; 
+	  RdFramMicro(&nvMem, nvAdr, sizeof(nvState_UNIT3_MODE_type));
+	  Type_Break= sPnt->Type_Break_ZIP;
+	  Time_Vubeg=sPnt->Time_Vubeg_ZIP;
+	
+ 	save_s16(ramPnt,progPnt->Pnt_INPUT18,Type_Break);
+    save_s16(ramPnt,progPnt->Pnt_INPUT19,Time_Vubeg);
+	save_s16(ramPnt,progPnt->Pnt_OUTPUT7,Type_Break);
+    save_s16(ramPnt,progPnt->Pnt_OUTPUT8,Time_Vubeg);
+		 sPnt->Type_Break=Type_Break;
+		 sPnt->Time_Vubeg=Time_Vubeg;
+	 }
+ 
+	save_s16(ramPnt, progPnt->Pnt_INPUT7	, f2int(Koeff_Pr, m10) 	);
+	nvMem.Koeff_Pr_Torque=Koeff_Pr;
+
+ //	БЛОК3
+		
+    sPnt->Regim_Privod=GlobalM3.Regim_Privod;
+ 	nvMem.Regim_Privod=GlobalM3.Regim_Privod;
+	
+     WrFramMicro(nvAdr, &nvMem, sizeof(nvState_UNIT3_MODE_type));
+
+    //  sPnt->flag_regim=0;
+	//  GlobalM3.FlagCommand.bit.ChangeRegim=1;
+}
+//================смена выбега и времени выбега
+   Type_Break=load_s16(ramPnt,progPnt->Pnt_INPUT18);
+   Time_Vubeg= load_s16(ramPnt,progPnt->Pnt_INPUT19);
+	
+if(GlobalM3.FlagCommand.bit.BitGotovWorkSVP==1)
+{
+	if((sPnt->Type_Break !=Type_Break)||(sPnt->Time_Vubeg!=Time_Vubeg))
+	{
+	        if((GlobalM3.Regim_Privod==REGIM_MASTER)||(GlobalM3.Regim_Privod==REGIM_ALONE))
+	         {
+
+		     sPnt->Type_Break =Type_Break;
+             sPnt->Time_Vubeg =Time_Vubeg;
+
+			    	sPnt->Type_Break_ZIP=Type_Break;
+             	   sPnt->Time_Vubeg_ZIP=Time_Vubeg;
+             	    nvMem.Type_Break=Type_Break;//RdFramMicro(&nvMem, nvAdr, sizeof(nvState_UNIT3_MODE_type));
+             	    nvMem.Time_Vubeg=Time_Vubeg;
+             	    WrFramMicro(nvAdr, &nvMem, sizeof(nvState_UNIT3_MODE_type));
+          	 save_s16(ramPnt,progPnt->Pnt_INPUT18,Type_Break);
+             save_s16(ramPnt,progPnt->Pnt_INPUT19,Time_Vubeg);
+ 	             save_s16(ramPnt,progPnt->Pnt_OUTPUT7,Type_Break);
+                 save_s16(ramPnt,progPnt->Pnt_OUTPUT8,Time_Vubeg);
+             
+	         }
+	}
+}
+
+//========================================================
+ Koeff_Pr=int2f(load_s16(ramPnt, progPnt->Pnt_INPUT7), d10);
+
+
+if(Koeff_Pr !=nvMem.Koeff_Pr_Torque) //коэфф поменялся
+{
+ 
+	nvMem.Koeff_Pr_Torque=Koeff_Pr; // запомнить в фрам
+	WrFramMicro(nvAdr, &nvMem, sizeof(nvState_UNIT3_MODE_type));
+	save_s16(ramPnt, progPnt->Pnt_INPUT7, f2int(Koeff_Pr, m10) 	); 
+}
+
+
+//=======проверка  убрать потом!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!=!!!!!!!!
+//if(GlobalM3.FlagCommand.bit.MeasureLmRs!=sPnt->pr_count)
+//{
+//	temp=Regim+1;
+//	if(temp>3)temp=0;
+//	save_s16(ramPnt,progPnt->Pnt_INPUT12,temp);
+//	sPnt->pr_count=GlobalM3.FlagCommand.bit.MeasureLmRs;
+//}
+//=======проверка  убрать потом!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   //БЛОК2
+ 
+//	БЛОК1
+//============================контроль аварии обмена
+if((GlobalM3.Regim_Privod==REGIM_MASTER)||(GlobalM3.Regim_Privod==REGIM_ALONE))
+{
+mode = load_s16(ramPnt, progPnt->Pnt_INPUT4);                          //86  авария обмена
+
+                  switch(mode)
+				  {
+				       case  MODE_OFF:
+                       clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT5);  //   avaria обмена
+		                clrBitMicro(ramPnt, progPnt-> Pnt_OUTPUT6);                     //  warning обмена
+                       break;
+					   case  MODE_FAIL:
+						    if(testBitMicro(ramPnt, progPnt->Pnt_INPUT17))
+							{
+							   setBitMicro(ramPnt, progPnt->Pnt_OUTPUT5);  //   avaria обмена
+							}
+						   else
+						   {
+                              clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT5);  //  avaria обмена
+							}
+                              clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT6);                     //  warning обмена
+					   break;
+					   case MODE_WARN:
+						    if(testBitMicro(ramPnt, progPnt->Pnt_INPUT17))
+							{
+                               setBitMicro(ramPnt, progPnt->Pnt_OUTPUT6);                     //  warning обмена                    //  warning обмена
+							}
+							else
+							{
+							 clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT6);                     //  warning обмена
+							}
+						   clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT5);  //  avaria обмена
+				       break;
+					
+				  }
+				   clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT9);                     //  warning неупр
+}
+else 
+{
+  if (GlobalM3.Regim_Privod==REGIM_NEUPR)
+  {
+	 setBitMicro(ramPnt, progPnt->Pnt_OUTPUT9);                     //  warning неупр
+  }
+  else
+  {  clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT9);                     //  warning неупр
+  }
+       clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT5);  //  avaria обмена
+	   clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT6);                     //  warning обмена
+}
+//==================================================================================================================
+//=========================ожидание сети  // новый алгоритм проверки наличия 3 фаз при включении=======================================================================
+//================================================================================================================= 
+GlobalM3.FlagCommand.bit.BitEnableWaitVoltage=load_s16 (ramPnt, progPnt->Pnt_INPUT11);
+if(testBitMicro(ramPnt, progPnt->Pnt_INPUT3))
+{temp_phase =1;
+//GlobalM3.TEMP1=100;
+}
+else
+{temp_phase =0;
+//GlobalM3.TEMP1=0;
+}
+if(GlobalM3.FlagCommand.bit.BitGotovWorkSVP){GlobalM3.Kvitirovanie |=0x0800;}
+else {GlobalM3.Kvitirovanie &=~(0x0800);}
+
+
+ if((GlobalM3.FlagCommand.bit.BitGotovWorkSVP ==1)&&(GlobalM3.FlagCommand.bit.BitEnableWaitVoltage!=0))
+ {
+    if(sPnt->count_Pause_start>0)
+	{  setBitMicro(ramPnt, progPnt->Pnt_OUTPUT10);  //    запрета заряда
+	        sPnt->count_Pause_start--;
+           if(temp_phase !=0) //обрыв фаз
+           {
+
+              if(sPnt->count_Pause_start==0)
+               {
+                   // GlobalM3.FlagCommand.bit.BitWAitPhase=1;
+
+                            sPnt->pr_PHase_enable=0;
+                            sPnt->count_Pause_phase=0;
+               }
+            }
+
+           clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+	}
+	else
+  	{
+	    if(temp_phase ==0) //нет обрыв фаз
+	    {
+//	        sPnt->pr_PHase_enable=10;
+ 	       // GlobalM3.FlagCommand.bit.BitWAitPhase=0;
+ 	                clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT10);  //   разреша заряда
+ 	               clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);  //    запрета аварии
+	    }
+	    else
+ 	    {
+////	        if(sPnt->pr_PHase_enable>0)
+////	      {  sPnt->pr_PHase_enable--;
+////	        if(sPnt->pr_PHase_enable>0)setBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);  //    запрета заряда
+////	        else clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+////	      }
+	      //  GlobalM3.FlagCommand.bit.BitWAitPhase=1;
+	       setBitMicro(ramPnt, progPnt->Pnt_OUTPUT10);  //    запрета заряда
+	    }
+  	}
+ }
+
+//else
+//{
+// clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+//GlobalM3.FlagCommand.bit.BitWAitPhase =0;
+//GlobalM3.FlagCommand.bit.Kvitirov_Phase=0;//
+//     if(testBitMicro(ramPnt, progPnt->Pnt_INPUT3)) //обрыв фаз
+//      {
+//          setBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+//      }
+//      else
+//      {
+//          clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+//      }
+//
+//
+//clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT10);  //   нет запрета заряда
+
+//}
+ //предупреждение ожидание сети
+// if(GlobalM3.FlagCommand.bit.BitWAitPhase)
+// {setBitMicro(ramPnt, progPnt->Pnt_OUTPUT6);  //предупреждение ожидание сети
+//  clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+//  setBitMicro(ramPnt, progPnt->Pnt_OUTPUT10);
+// }
+// else
+// {clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT6);
+// }
+////ожидание сети  // новый алгоритм проверки наличия 3 фаз при включении
+//if(testBitMicro(ramPnt, progPnt->Pnt_INPUT3))
+//{
+// 	     if(GlobalM3.FlagCommand.bit.BitEnableWaitVoltage!=0)
+//  	       {
+//  	    	if(sPnt->count_Pause_start>0)
+//  	    		{sPnt->count_Pause_start--;
+//
+//  	    		}
+//  	    	else
+//  	    		{GlobalM3.FlagCommand.bit.BitYellowLD=1;   // моргать светодиодом    LEDREADY  PUMP_CMDCONTROL_PHASE();// GlobalM3.FlagCommand.bit.BitGotovSet= 1;
+//
+//  	    		}
+//   	      }
+//		 else 
+//		 {	 setBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+//		    GlobalM3.FlagCommand.bit.BitYellowLD=0;
+//		 }
+// }
+//else 
+//{clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT3);
+//GlobalM3.FlagCommand.bit.BitYellowLD =0;
+//}
+ //==================================================Работа мастером
+if(GlobalM3.FlagCommand.bit.BitGotovWorkSVP==0)
+{
+	if (GlobalMstSlv.Uart0_Mode == ModbusMaster || GlobalMstSlv.Uart2_Mode == ModbusMaster)
+		{temp_regim=REGIM_MASTER;
+
+		}
+	else
+		{temp_regim=0;
+
+		}
+}
+else
+{
+	 if((GlobalM3.Regim_Privod==REGIM_ALONE)||(GlobalM3.Regim_Privod==REGIM_MASTER))
+		 {temp_regim=REGIM_MASTER;
+
+		 }
+	 else
+	  {temp_regim=0;
+
+	  }
+}
+
+  if (temp_regim==REGIM_MASTER)//MASTER       (Uart0_Mode == ModbusMaster || Uart2_Mode == ModbusMaster)
+ {
+          //                  mPnt3->Master_STATE &=~(0xff);
+          //        if(Fail_Tek_DRV!=0) mPnt3->Master_STATE |=0x80;     // Состояние привода  мастер  на слейв     
+    save_s16(ramPnt,progPnt->Pnt_OUTPUT7,Type_Break);
+	save_s16(ramPnt,progPnt->Pnt_OUTPUT8,Time_Vubeg);
+ 	save_s16(ramPnt,progPnt->Pnt_INPUT18,Type_Break);
+ 	save_s16(ramPnt,progPnt->Pnt_INPUT19,Time_Vubeg);
+ 
+//принимаю
+                   mPnt3->Slave_STATE =GlobalMstSlv.Slave_STATE;        // Состояние привода  слейв
+				   mPnt3->Slave_IQ_Torque=(_iq)GlobalMstSlv.Slave_IQ_Torque;    //со слейв принять  момент текущий
+	               mPnt3->Slave_IQ_FREQ=(_iq)GlobalMstSlv.Slave_IQ_FREQ ;         //со слейв принять скорост  текущий
+
+	// if(mPnt3->TorqueBoard< mPnt3->Slave_IQ_Torque)
+	//	 {
+			 mPnt3->Master_STATE = Torque_Big; //2 момент слейва больше уставки
+
+	//	 }
+	// else
+	//	 {mPnt3->Master_STATE = Torque_Little;//1
+
+	//	 }
+           
+	// if(GlobalC28.NumFailDRV !=0) mPnt3->Master_STATE|=0x80;
+               
+    //передаю
+//ДБ
+//GlobalM3.Master_STATE    формировать
+//GlobalM3.Master_IQ_FREQ  =  GlobalC28.Wout
+//GlobalM3.Master_IQ_Torque =GlobalC28.Mzad;
+
+
+                //   mPnt3->Master_IQ_Torque = GlobalC28.Tzad;
+	            //   mPnt3->Master_IQ_FREQ =  GlobalC28.Wout;
+
+	   //временно перенес сюда
+	 //  mPnt3->Master_IQ_Torque= GlobalC28.Tzad;
+	 // GlobalMstSlv.Master_IQ_Torque=GlobalC28.Tzad;
+   // if((mPnt3->Slave_STATE &0x80)!=0) GlobalMstSlv.SlaveStatusWord1|=0x2000;        // Состояние привода  слейв  ваврии
+
+			       GlobalMstSlv.Master_STATE = mPnt3->Master_STATE;     // Состояние привода  мастер  на слейв
+	             //  GlobalMstSlv.Master_IQ_Torque =;     //задание момента на слейв (выход РС)
+	               GlobalMstSlv.Master_IQ_FREQ =  mPnt3->Master_IQ_FREQ;    //задание скорости на слейв ( ОС скорости)
+				   mPnt3->Master_IQ_Torque=GlobalC28.Tzad;// _IQdiv(GlobalC28.Tzad,_IQ(mPnt3->Lm));//mPnt3->TorqueBoard);
+	               GlobalMstSlv.Master_IQ_Torque=mPnt3->Master_IQ_Torque;
+
+               	 mPnt3->Driver_STATE= ModbusMaster;
+}
+
+   //==================================================Работа слейвом
+if(GlobalM3.FlagCommand.bit.BitGotovWorkSVP==0)
+{
+	if (GlobalMstSlv.Uart0_Mode == ModbusSlave || GlobalMstSlv.Uart0_Mode == ModbusSlave)
+		{temp_regim=REGIM_SLAVE;
+
+		}
+	else
+		{temp_regim=0;
+
+		}
+}
+else
+{
+	 if((GlobalM3.Regim_Privod==REGIM_SLAVE)||(GlobalM3.Regim_Privod==REGIM_NEUPR))
+		 {temp_regim=REGIM_SLAVE;
+
+		 }
+	 else
+		 {temp_regim=0;
+
+		 }
+}
+
+  if (temp_regim==REGIM_SLAVE)//Slave
+ {
+// А если хоть один Slave - работаем как Slave
+ 
+     save_s16(ramPnt,progPnt->Pnt_OUTPUT7,STOP_VUBEG);//принуд установка в выбег
+	  save_s16(ramPnt,progPnt->Pnt_OUTPUT8,0);//принуд установка время выбег в 0
+	save_s16(ramPnt,progPnt->Pnt_INPUT18,STOP_VUBEG);//принуд установка в выбег
+   save_s16(ramPnt,progPnt->Pnt_INPUT19,0);//принуд установка время выбег в 0
+
+                        mPnt3->Master_IQ_FREQ=GlobalMstSlv.Master_IQ_FREQ ;    //задание скорости на слейв 
+                	   
+  // принимаю
+						temp_s16 = load_s16(ramPnt, progPnt->Pnt_INPUT15);   //2  K_PROPOR
+	                  //   fL =(f32)temp_s16*0.01;
+					//	fL =1.0;//fL* mPnt3->Lm;
+			   mPnt3->Master_STATE=GlobalMstSlv.Master_STATE;        // Состояние привода	 мастер
+			   mPnt3->Master_IQ_Torque=GlobalMstSlv.Master_IQ_Torque;// _IQmpy(GlobalMstSlv.Master_IQ_Torque,_IQ(fL));//(GlobalMstSlv.Master_IQ_Torque,mPnt3->TorqueBoard);
+	           mPnt3->Master_IQ_FREQ=GlobalMstSlv.Master_IQ_FREQ ;      // будет задание на момент скорость принять
+	          // mPnt3->Master_IQ_Torque= _IQmpy(mPnt3->Master_IQ_Torque,_IQ(1.1));
+// передаю
+//GlobalM3.Slave_STATE     формировать
+//GlobalM3.Slave_IQ_FREQ  =  GlobalC28.Wout
+//GlobalM3.Slave_IQ_Torque =GlobalC28.Mout;
+
+
+				   mPnt3->Slave_IQ_Torque = GlobalC28.Mout;
+                   mPnt3->Slave_IQ_FREQ = GlobalC28.Wout;
+                  
+	               GlobalMstSlv.Slave_STATE = mPnt3->Slave_STATE;     // Состояние привода  слейв  на мастер
+	               GlobalMstSlv.Slave_IQ_Torque = mPnt3->Slave_IQ_Torque;     //задание момента на слейв (выход РС)
+	               GlobalMstSlv.Slave_IQ_FREQ = mPnt3->Slave_IQ_FREQ;    //задание скорости на слейв ( ОС скорости)
+
+ // if((GlobalMstSlv.Master_STATE &0x80)!=0) GlobalMstSlv.SlaveStatusWord1|=0x2000;        // Состояние привода  слейв  ваврии
+          
+	         mPnt3->Driver_STATE= ModbusSlave;
+  }  
+ 
+//===================================== режим наружу
+
+ if(GlobalM3.FlagCommand.bit.BitGotovWorkSVP==1)
+ {
+	    switch (GlobalM3.Regim_Privod)
+		{
+		case   REGIM_ALONE:    //  0 //0 - одиночный
+			temp=0;
+		 clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT1);	//rele master-slave 
+        break;
+    case REGIM_MASTER:    //   1 //1 - master
+		temp= ModbusMaster;
+		 setBitMicro(ramPnt, progPnt->Pnt_OUTPUT1);	//rele master-slave
+		  break;
+   case REGIM_SLAVE:    //   2 //2 - slave
+	   temp=ModbusSlave;
+	    clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT1);	//rele master-slave
+	 	  break;
+    case REGIM_NEUPR:    //   3 //3 - неуправляемый
+		temp=0;
+		 clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT1);	//rele master-slave
+		    break;
+		}
+		save_s16(ramPnt,progPnt->Pnt_OUTPUT4,temp);
+ }
+
+     return &progPnt->Pnt_End;
+};
+//====================CONTROL_PHASE==========================
+//void CONTROL_PHASE(void)
+//{
+//u16	fail=0;
+//s16  ErrorLocal;
+//if(GlobalM3.FlagCommand.bit.BitGotovWorkSVP ==1)
+//{
+//                                             #ifdef    _PROJECT_FOR_CCS_
+// 	       			                    	fail= PhaseState.FailAllFaz;
+// 	       			                         #endif
+// 	       			                    		// fail=  PhaseState.FailAllFaz;
+// // 		GlobalM3.FlagCommand.bit.BitGotovSet=1;   //!!!!!!!!!
+// 	//  алгоритм  ведущий - ведомый с момментом  есть  разрешение определения отсутствия 3 фаз включение до квитирования без напряжения
+// if (fail !=0) // && (GlobalM3.FlagCommand.bit.EnableWaitVoltage!=0)&&(GlobalM3.FlagCommand.bit.EnableFirstControl==1)&&(GlobalM3.FlagCommand.bit.BitAlgoritmSVP==1))   //  алгоритм  ведущий - ведомый с момментом)
+// 	    {
+// 	      		ErrorLocal=GlobalC28.NumFail; //игнорируем ошибки
+// 	      if((ErrorLocal==FastFailMask_ruU)||(ErrorLocal==FastFailMask_ruV)||(ErrorLocal==FastFailMask_ruW)||(ErrorLocal==SlowFail_supplyPhLoss))
+// 	    	   {ErrorLocal=0;
+//
+// 	    	   }
+//	                 //GlobalM3.FlagCommand.bit.BitEnableWaitVoltage;
+// 	                   if((GlobalM3.NumSlowFail==0) && (ErrorLocal==0)) // если  других аварий нет
+// 	       	             {
+// 	           	    		 	GlobalM3.FlagCommand.bit.BitWAitPhase =1;   // моргать светодиодом    LEDREADY  PUMP_CMD
+// 	       	           	   }
+//
+//  	   }
+// else
+//	 {GlobalM3.FlagCommand.bit.BitYellowLD =0;
+//
+//	 }
+//  }
+//}
+#endif
+//********************************************************
+#ifdef   GET_FUNC_TABL_OPIS
+const char TblFuncUNIT3_1[32]={
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //1   K_PROPOR
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //2   K_INTEGR
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //3 авария фаз
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //4 режим U2 
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //5  режим привода
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //6  Fzad
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //7   
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //8
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //9
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //10 
+		S16_PIN_TYPE | INPUT_PIN_MODE,     //11 
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //12  
+		S16_PIN_TYPE | INPUT_PIN_MODE,     //13  
+        S32_PIN_TYPE | INPUT_PIN_MODE,     //14  
+		S16_PIN_TYPE | INPUT_PIN_MODE,     //15  
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //16  
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //17  
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //18  
+		S16_PIN_TYPE | INPUT_PIN_MODE,     //19  
+        S16_PIN_TYPE | INPUT_PIN_MODE,     //20  
+
+
+      
+         BIT_PIN_TYPE | OUTPUT_PIN_MODE,     //21  OUTPUT1  
+        BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //22  OUTPUT2
+        BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //23  OUTPUT3
+	    S16_PIN_TYPE | OUTPUT_PIN_MODE,    //24  OUTPUT4
+		BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //25  OUTPUT5
+		BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //26  OUTPUT6
+		S16_PIN_TYPE | OUTPUT_PIN_MODE,    //27  OUTPUT7
+		S16_PIN_TYPE | OUTPUT_PIN_MODE,    //28  OUTPUT8
+		BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //29  OUTPUT9
+		BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //30 OUTPUT10
+		BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //31 OUTPUT11
+		S16_PIN_TYPE | OUTPUT_PIN_MODE     //32 OUTPUT12
+};
+#endif
+   
+//********************************************************
+#ifdef   GET_FUNC_OPIS
+//SymbolName,  Prefix,  typePin, FuncPnt, SizeOfState, SizeOfNvState, ExeLogicBlock
+OpisFuncBlock("UNIT3", "DD", TblFuncUNIT3_1, FuncUNIT3_1, sizeof(TblFuncUNIT3_1), sizeof(PICONTROL_State_type),sizeof(nvState_UNIT3_MODE_type), 1),
+#endif
+//********************************************************
+#ifdef  GET_FUNC_PNT
+    (pFuncMicro_type)FuncUNIT3_1,
+#endif
+//********************************************************
+//БЛОК1
+ 	//if(sPnt->countImpuls !=0)
+	 //	 {
+	 //		        	  if(sPnt->countLEDREADY >0)
+	 //		        		  {sPnt->countLEDREADY--;
+
+	 //		        		  }
+	 //			 		  else
+	 //			 		 	  {
+	 //			 		  	            	sPnt->countImpuls--;
+	 //			 		  	            	if(sPnt->countImpuls==0)
+	 //			 		  	            	{
+	 //			 		  	            	GlobalM3.FlagCommand.bit.ChangeRegim=0;
+	 //			 		  	            	}
+	 //			 		  	                sPnt->countLEDREADY =K_TIME_CALL_MICRO_TAKT;
+	 //			 		 		       	 	       	     	       if(testBitMicro(ramPnt, progPnt->Pnt_OUTPUT1))
+
+	 //			 		 		       	 	       	     	        	{
+	 //			 		 		       	 	       	     	        		clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT1); //Relay1
+	 //			 		 		       	 	       	     	        	}
+	 //			 		 		       	 	       	     	        	else
+	 //			 		 		       	 	       	     	        	{
+	 //			 		 		       	 	       	     	        		setBitMicro(ramPnt, progPnt->Pnt_OUTPUT1);  //Relay1
+	 //			 		 		       	 	       	     	        	}
+ 
+	 //			 		      }
+	 //	 }
+
+  // if(sPnt->countImpuls ==1)GlobalM3.FlagCommand.bit.ChangeRegim=0;
+  //БЛОК2
+
+//   //подсчет принятых импульсов
+//if((GlobalM3.FlagCommand.bit.BitGotovWorkSVP==1)&&(GlobalM3.FlagCommand.bit.PwmOn==0))
+//{
+//			 //==прием импульсов по ди3
+//	 if(GlobalM3.FlagCommand.bit.BitInput_ChangeDI!=sPnt->Bit_ChangeDI) //перепад уровня по входу
+//	  {
+//		  sPnt->Bit_ChangeDI =GlobalM3.FlagCommand.bit.BitInput_ChangeDI;
+//		  sPnt->count_ChangeDI++;
+//		//  GlobalM3.Count_Impuls_Priem=sPnt->Bit_ChangeDI;
+//		  sPnt->countREGIM_PRIEM =3*K_TIME_CALL_MICRO_TAKT; // пауза для подсчета времени останова
+//		 // sPnt->flag_regim=1;
+//		   GlobalM3.FlagCommand.bit.ChangeRegimSlave=1;
+//	  }
+//	 else
+//	  {
+//		 sPnt->countREGIM_PRIEM--;
+//	  }
+//	      if(sPnt->countREGIM_PRIEM==0)// прием окончен
+//	      {  GlobalM3.FlagCommand.bit.ChangeRegimSlave=0;   
+//             if(sPnt->count_ChangeDI<2)
+//			 { //sPnt->flag_regim=0;
+//			 //GlobalM3.FlagCommand.bit.ChangeRegim=0;
+//			 }
+//	         else if(sPnt->count_ChangeDI< COUNT_IMP_ALONE+1)//одиночный
+//			 { // GlobalM3.RegimPriem=REGIM_NEUPR; //неуправ
+//               //   sPnt->Regim_Privod = REGIM_NEUPR; // чтение состояния  при включении
+//				 GlobalM3.Regim_Privod=REGIM_NEUPR; 
+//  	              save_s16(ramPnt,progPnt->Pnt_INPUT12,GlobalM3.Regim_Privod);                        
+//			 
+//			 }
+//	         else if(sPnt->count_ChangeDI<COUNT_IMP_MASTER+1)//master
+//			 {//	 GlobalM3.RegimPriem=REGIM_SLAVE;  //slave
+//			     GlobalM3.Regim_Privod=REGIM_SLAVE; 
+// 	           //  sPnt->Regim_Privod =REGIM_SLAVE; // чтение состояния  при включении
+//                 save_s16(ramPnt,progPnt->Pnt_INPUT12,GlobalM3.Regim_Privod);
+//
+//			 }
+//
+//	         else if(sPnt->count_ChangeDI<COUNT_IMP_SLAVE+1)//slave
+//			 {	//  GlobalM3.RegimPriem=REGIM_MASTER;//master
+//			      GlobalM3.Regim_Privod=REGIM_MASTER; 
+//             	//  sPnt->Regim_Privod =REGIM_MASTER; // чтение состояния  при включении
+//            	  save_s16(ramPnt,progPnt->Pnt_INPUT12,GlobalM3.Regim_Privod);
+//	        }
+//	         else if(sPnt->count_ChangeDI< COUNT_IMP_NEUPR+1)// не задейств
+//			 {   //  GlobalM3.RegimPriem=REGIM_ALONE; //один
+//                   GlobalM3.Regim_Privod=REGIM_ALONE; 
+//                //   sPnt->Regim_Privod = REGIM_ALONE; // чтение состояния  при включении
+//             	   save_s16(ramPnt,progPnt->Pnt_INPUT12,GlobalM3.Regim_Privod);
+//			 }
+//
+//	         sPnt->count_ChangeDI=0;
+//           //   sPnt->flag_regim=0;
+// 
+//	      }
+//}
+// 	 //==окончание приема импульсов по ди3
+//БЛОК3
+			//if((GlobalM3.FlagCommand.bit.BitGotovWorkSVP==1)&&(GlobalM3.FlagCommand.bit.PwmOn==0)&&(GlobalM3.FlagCommand.bit.ChangeRegim==0))// sPnt->flag_regim==1))
+			//		{
+ 	 //						 
+	 	//						 switch(GlobalM3.Regim_Privod)
+	 	//									 {
+	 	//									 case REGIM_ALONE: //одиночн
+	 	//		       						sPnt->countImpuls=COUNT_IMP_ALONE;//3;
+	 	//									break;
+	 	//									case REGIM_MASTER:// master
+	 	//		      						sPnt->countImpuls=COUNT_IMP_MASTER;//7;
+	 	//									 break;
+	 	//								   case REGIM_SLAVE: //slave
+	 	//		     						sPnt->countImpuls=COUNT_IMP_SLAVE;//10;
+	 	//									   break;
+	 	//								  case REGIM_NEUPR:// не задейств
+	 	//		      						sPnt->countImpuls=COUNT_IMP_NEUPR;//13;
+	 	//									break;
+	 	//									 }
+
+		 //       						sPnt->countLEDREADY =K_TIME_CALL_MICRO_TAKT; // счетчик времени импульсов
+		 //       						clrBitMicro(ramPnt, progPnt->Pnt_OUTPUT1);// rele    mPnt3->Cooler_PWM = 1.0f;
+			//	 	}

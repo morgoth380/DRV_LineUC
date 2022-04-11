@@ -1,0 +1,9 @@
+SCC = This is a Source Code Control file
+
+[AT24_emu.sln]
+SCC_Aux_Path = "\\file\VSS_IND"
+SCC_Project_Name = "$/IND/000_TMS320/AT24_emu", BCAAAAAA
+
+[AT24_emu.vcproj]
+SCC_Aux_Path = "\\file\VSS_IND"
+SCC_Project_Name = "$/IND/000_TMS320/AT24_emu", BCAAAAAA
