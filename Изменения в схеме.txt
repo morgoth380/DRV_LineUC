@@ -6,3 +6,6 @@
 6) Лист FAIL. Блок WARNINGS. Добавлена цепь WARN_MASK_2.
 7) Лист FAIL. Группа текстов TXT_WARN. Добавлены тексты 33, 34.
 8) Лист DRV. Блок STOP заменен на STOP_2. Добавлена цепь STOP_SLEEP_NO_FLOW.
+9) Лист FAIL. Блок BIT16_TO_U16 сигналов предупреждений. Добавлена цепь NF_SLEEP_WARNING.
+10) Группа текстов TXT_WARN. Добавлен текст №35.
+11) Лист DRV. Блок PUSK_READY_2. Добавлена цепь NF_SLEEP_BLINK.

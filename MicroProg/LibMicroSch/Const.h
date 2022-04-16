@@ -1055,6 +1055,7 @@ _kAktivirovan_rezhim_ehvakuacii_31,       //Активирован режим э
 _kAktiven_rezhim_simulyacii_32,           //Активен режим симуляции
 _kNet_potoka_33,                          //Нет потока
 _kSukhojj_khod_34,                        //Сухой ход
+_kRezhim_Son_35,                          //Режим Сон
 }TXT_WARN;
 
 typedef enum	{

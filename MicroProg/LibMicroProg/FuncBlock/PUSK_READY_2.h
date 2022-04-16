@@ -33,6 +33,9 @@ u16 *FuncPUSK_READY_2_1(FuncPUSK_READY_2_type *progPnt, u32 ramPnt)
      s16		        i, notRdyReason;
      u16                        NoSpdStatus;
      u16                        MeasParam, EnablePusk;
+     u16                        sleepBlink;
+     u16                        blinkEnable;
+     u16                        readyStatus;
      StateFuncPUSK_READY_1      *sPnt;
           
      sPnt = (StateFuncPUSK_READY_1 *)(ramPnt + progPnt->Pnt_State);
@@ -41,6 +44,9 @@ u16 *FuncPUSK_READY_2_1(FuncPUSK_READY_2_type *progPnt, u32 ramPnt)
      clrBitMicro (ramPnt, progPnt->Pnt_NoSpdFault);
      clrBitMicro (ramPnt, progPnt->Pnt_NoSpdWarn);
      clrBitMicro (ramPnt, progPnt->Pnt_WrnPuskForbid);
+     
+     blinkEnable = testBitMicro(ramPnt, progPnt->Pnt_In2); //Sleep mode status
+     sleepBlink = testBitMicro(ramPnt, progPnt->Pnt_In1);  //Blink signal
      
      NoSpdStatus = load_s16 (ramPnt, progPnt->Pnt_DiskrNoSpd);
      MeasParam   = load_s16 (ramPnt, progPnt->Pnt_MeasParam);
@@ -63,8 +69,9 @@ u16 *FuncPUSK_READY_2_1(FuncPUSK_READY_2_type *progPnt, u32 ramPnt)
           clrBitMicro(ramPnt, progPnt->Pnt_Pusk_Cmn);             // не даем команду пуска
      }
      else{ //иначе пускаться ничего не мешает
-          if(!GlobalM4.FlagCommand.bit.PwmOn){                 // если на данный момент PWM отключено
-              setBitMicro(ramPnt, progPnt->Pnt_ReadyPusk);     // даем сигнал готовности
+          if(!GlobalM4.FlagCommand.bit.PwmOn){                   // если на данный момент PWM отключено
+              readyStatus = (blinkEnable == 1) ? sleepBlink : 1; //If sleep mode is active then ready signal blinks
+              defBitMicro(ramPnt, progPnt->Pnt_ReadyPusk, readyStatus);     // даем сигнал готовности
           }
           else{ 
               clrBitMicro(ramPnt, progPnt->Pnt_ReadyPusk);     // иначе PWM уже работает и сбрасываем сигнал готовности
@@ -133,8 +140,8 @@ const char TblFuncPUSK_READY_2_1[27]={
         BIT_PIN_TYPE | INPUT_PIN_MODE,     //15  EnablePusk
         S16_PIN_TYPE | INPUT_PIN_MODE,     //16  FAILTEK
         S16_PIN_TYPE | INPUT_PIN_MODE,     //17  MeasParam
-        S16_PIN_TYPE | INPUT_PIN_MODE,     //18  In1
-        S16_PIN_TYPE | INPUT_PIN_MODE,     //19  In2
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //18  In1
+        BIT_PIN_TYPE | INPUT_PIN_MODE,     //19  In2
         S16_PIN_TYPE | OUTPUT_PIN_MODE,    //20  Out1
         S16_PIN_TYPE | OUTPUT_PIN_MODE,    //21  Out2
         BIT_PIN_TYPE | OUTPUT_PIN_MODE,    //22  NoSpdFault
