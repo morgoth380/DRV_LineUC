@@ -1,0 +1,8 @@
+1) Лист Menu. В мегагруппу MGRP6 "Механизм" добавлена группа 52 "Настройки насоса".
+2) Лист DRV. Блок PUSK_READY заменен на PUSK_READY_2. Добавлена цепь PUSK_SLEEP_NO_FLOW.
+3) Лист FAIL. Блок BIT16_TO_U16. Добавлены цепи NF_FAILURE и DR_FAILURE.
+4) Лист FAIL. Группа текстов TXT_ERR. Добалены тексты №86, 87.
+5) Лист FAIL. Добавлен блок BIT16_TO_U16 для предупреждений. Добавлены цепи NF_WARNING, DR_WARNING, WARN_MASK_2.
+6) Лист FAIL. Блок WARNINGS. Добавлена цепь WARN_MASK_2.
+7) Лист FAIL. Группа текстов TXT_WARN. Добавлены тексты 33, 34.
+8) Лист DRV. Блок STOP заменен на STOP_2. Добавлена цепь STOP_SLEEP_NO_FLOW.

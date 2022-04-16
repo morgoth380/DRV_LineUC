@@ -713,9 +713,11 @@ _kFazirovka_ehnkodera_prervana_82,        //Фазировка энкодера 
 _kOshibka_fiksacii_kabiny_lifta_83,       //Ошибка фиксации кабины лифта
 _kAvariya_pol_zovatelya_1_84,             //Авария пользователя 1
 _kAvariya_pol_zovatelya_2_85,             //Авария пользователя 2
-_kZaryad_Ud_86,                           //Заряд Ud
-_kZaderzhkaMTZ_87,                        //ЗадержкаМТЗ
-_kVybeg_88,                               //Выбег
+_kNet_potoka_86,                          //Нет потока
+_kSukhojj_khod_87,                        //Сухой ход
+_kZaryad_Ud_88,                           //Заряд Ud
+_kZaderzhkaMTZ_89,                        //ЗадержкаМТЗ
+_kVybeg_90,                               //Выбег
 }TXT_ERR;
 
 typedef enum	{
@@ -946,6 +948,13 @@ _kAnalog__vkhod_2_2,                      //Аналог. вход 2
 }NET01046;
 
 typedef enum	{
+_kOtkl_0,                                 //Откл
+_kPreduprezhdenie_1,                      //Предупреждение
+_kAvariya_2,                              //Авария
+_kRezhim_sna_3,                           //Режим сна
+}NET00867;
+
+typedef enum	{
 _kAnalog__vkhod_1_0,                      //Аналог. вход 1
 _kAnalog__vkhod_2_1,                      //Аналог. вход 2
 _kASU_2,                                  //АСУ
@@ -1044,6 +1053,8 @@ _kDiskretnyjj_vkhod_uzhe_naznachen_29,    //Дискретный вход уже
 _kDiskretnaya_funkciya_uzhe_naznachena_30,  //Дискретная функция уже назначена
 _kAktivirovan_rezhim_ehvakuacii_31,       //Активирован режим эвакуации
 _kAktiven_rezhim_simulyacii_32,           //Активен режим симуляции
+_kNet_potoka_33,                          //Нет потока
+_kSukhojj_khod_34,                        //Сухой ход
 }TXT_WARN;
 
 typedef enum	{

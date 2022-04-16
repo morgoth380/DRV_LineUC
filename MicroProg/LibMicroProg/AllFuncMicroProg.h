@@ -87,7 +87,6 @@
 #include "FuncBlock/EXT_BLOCKS_PARAMS.h"
 #include "FuncBlock/DERATING_CONTROL.h" // Модуль дерейтинга
 
-
 /*
 
 #include "FuncBlock/LOGGER1.h"
@@ -124,8 +123,10 @@
 //#include "FuncBlock/RAMP_CTRL.h"
 
 #include "FuncBlock/DRV_V5.h"
-#include "FuncBlock/PUSK_READY.h"
-#include "FuncBlock/STOP.h"
+//#include "FuncBlock/PUSK_READY.h"
+#include "FuncBlock/PUSK_READY_2.h"
+//#include "FuncBlock/STOP.h"
+#include "FuncBlock/STOP_2.h"
 #include "FuncBlock/POWER_ON_PUSK.h"
 #include "FuncBlock/START_STOP_MUX.h"
 #include "FuncBlock/FUNCTIONAL_BLOCK.h"
@@ -157,6 +158,7 @@
 #include "FuncBlock/EVAC_V3.h"
 #include "FuncBlock/CONT_FAIL.h"
 #include "FuncBlock/ENCO_PHASING_BLOCK.h"
+#include "FuncBlock/NO_FLOW_DR_RUN2.h"
 
 /*
 
@@ -309,7 +311,6 @@
 #include "FuncBlock/PULSE_FALL.h"
 
 #include "FuncBlock/BOOTLOADER.h"
-
 
 /*
 

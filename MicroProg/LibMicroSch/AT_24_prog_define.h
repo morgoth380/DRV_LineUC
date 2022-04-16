@@ -2,9 +2,7 @@
 #define present_TIME_CONTROL_1           1
 #define present_FACTORY_SET_1            1
 #define present_POWER_ON_PUSK_1          1
-#define present_PUSK_READY_1             1
 #define present_PAROLES_1                1
-#define present_STOP_1                   1
 #define present_UF5_F2S_1                1
 #define present_TEMP_LSU_2_1             1
 #define present_BASE_CALC_1              1
@@ -82,6 +80,9 @@
 #define present_LIFT_CMD_V3_1            1
 #define present_START_STOP_MUX_1         1
 #define present_EVAK_V3_1                1
+#define present_NO_FLOW_DR_RUN2_1        1
 #define present_ENCO_PHASING_BLOCK_1     1
 #define present_DERATING_CONTROL_1       1
-// 85
+#define present_PUSK_READY_2_1           1
+#define present_STOP_2_1                 1
+// 86
