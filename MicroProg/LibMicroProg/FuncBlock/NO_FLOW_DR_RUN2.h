@@ -407,7 +407,7 @@ const char TblFuncNO_FLOW_DR_RUN2_1[31]={
 //********************************************************
 #ifdef    GET_FUNC_OPIS
 //SymbolName,  Prefix,  typePin, FuncPnt, SizeOfState, SizeOfNvState, ExeLogicBlock
-OpisFuncBlock("NO_FLOW_DR_RUN2", "DA", TblFuncNO_FLOW_DR_RUN2_1, FuncNO_FLOW_DR_RUN2_1, sizeof(TblFuncNO_FLOW_DR_RUN2_1), 0, 0, 1),
+OpisFuncBlock("NO_FLOW_DR_RUN2", "DA", TblFuncNO_FLOW_DR_RUN2_1, FuncNO_FLOW_DR_RUN2_1, sizeof(TblFuncNO_FLOW_DR_RUN2_1), sizeof(FuncNO_FLOW_DRY_RUN_State_type), sizeof(nvFuncNO_FLOW_DRY_RUN_State_type), 1),
 #endif
 //********************************************************
 #ifdef    GET_FUNC_PNT

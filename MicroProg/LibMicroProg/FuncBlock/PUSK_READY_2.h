@@ -155,7 +155,7 @@ const char TblFuncPUSK_READY_2_1[27]={
 //********************************************************
 #ifdef    GET_FUNC_OPIS
 //SymbolName,  Prefix,  typePin, FuncPnt, SizeOfState, SizeOfNvState, ExeLogicBlock
-OpisFuncBlock("PUSK_READY_2", "DD", TblFuncPUSK_READY_2_1, FuncPUSK_READY_2_1, sizeof(TblFuncPUSK_READY_2_1), 0, 0, 1),
+OpisFuncBlock("PUSK_READY_2", "DD", TblFuncPUSK_READY_2_1, FuncPUSK_READY_2_1, sizeof(TblFuncPUSK_READY_2_1), sizeof(StateFuncPUSK_READY_1), 0, 1),
 #endif
 //********************************************************
 #ifdef    GET_FUNC_PNT

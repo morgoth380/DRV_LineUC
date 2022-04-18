@@ -51,7 +51,9 @@
 #include "FuncBlock/TEMP_CONTROL.h"     // Контроль и управление вентиляторами
 #include "FuncBlock/factory_set.h"      // Выбор набора уставок
 #include "FuncBlock/PERIF_V2.h"         // ПЕРИФФЕРИЯ ПРИВОДА (ВХОДА И ВЫХОДА)
-#include "FuncBlock/AIN_SCALE3_V2.h"    // Аналоговые входы
+//#include "FuncBlock/AIN_SCALE3_V2.h" // Аналоговые входы
+#include "FuncBlock/AIN_SCALE_V3.h"    // Аналоговые входы
+#include "FuncBlock/END_OF_CURVE.h"    // Контроль утечки в трубе
 
 #include "FuncBlock/Current_control.h"    // Регулятор нагрузки
 

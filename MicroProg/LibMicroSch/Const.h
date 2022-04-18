@@ -715,9 +715,10 @@ _kAvariya_pol_zovatelya_1_84,             //Авария пользовател�
 _kAvariya_pol_zovatelya_2_85,             //Авария пользователя 2
 _kNet_potoka_86,                          //Нет потока
 _kSukhojj_khod_87,                        //Сухой ход
-_kZaryad_Ud_88,                           //Заряд Ud
-_kZaderzhkaMTZ_89,                        //ЗадержкаМТЗ
-_kVybeg_90,                               //Выбег
+_kKonecKHarakt_ki_88,                     //КонецХаракт-ки
+_kZaryad_Ud_89,                           //Заряд Ud
+_kZaderzhkaMTZ_90,                        //ЗадержкаМТЗ
+_kVybeg_91,                               //Выбег
 }TXT_ERR;
 
 typedef enum	{
@@ -955,6 +956,19 @@ _kRezhim_sna_3,                           //Режим сна
 }NET00867;
 
 typedef enum	{
+_kOtkl_0,                                 //Откл
+_kPreduprezhdenie_1,                      //Предупреждение
+_kAvariya_2,                              //Авария
+}NET00682;
+
+typedef enum	{
+_kAin_1_0,                                //Ain 1
+_kAin_2_1,                                //Ain 2
+_kAin_3_2,                                //Ain 3
+_kAin_4_3,                                //Ain 4
+}NET00673;
+
+typedef enum	{
 _kAnalog__vkhod_1_0,                      //Аналог. вход 1
 _kAnalog__vkhod_2_1,                      //Аналог. вход 2
 _kASU_2,                                  //АСУ
@@ -1056,6 +1070,7 @@ _kAktiven_rezhim_simulyacii_32,           //Активен режим симул
 _kNet_potoka_33,                          //Нет потока
 _kSukhojj_khod_34,                        //Сухой ход
 _kRezhim_Son_35,                          //Режим Сон
+_kKonecKHarakt_ki_36,                     //КонецХаракт-ки
 }TXT_WARN;
 
 typedef enum	{

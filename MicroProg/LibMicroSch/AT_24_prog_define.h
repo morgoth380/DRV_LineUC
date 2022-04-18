@@ -8,7 +8,7 @@
 #define present_BASE_CALC_1              1
 #define present_MB_0X05_1                1
 #define present_OR-2_1                   1
-#define present_AIN_SCALE3_V2_1          1
+#define present_AIN_SCALE_V3_1           1
 #define present_PORT_UART_3_1            1
 #define present_PERIF_V2_1               1
 #define present_LOAD_LOSS_1              1
@@ -85,4 +85,5 @@
 #define present_DERATING_CONTROL_1       1
 #define present_PUSK_READY_2_1           1
 #define present_STOP_2_1                 1
-// 86
+#define present_END_OF_CURVE_1           1
+// 87
