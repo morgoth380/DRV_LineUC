@@ -962,13 +962,6 @@ _kAvariya_2,                              //Авария
 }NET00682;
 
 typedef enum	{
-_kAin_1_0,                                //Ain 1
-_kAin_2_1,                                //Ain 2
-_kAin_3_2,                                //Ain 3
-_kAin_4_3,                                //Ain 4
-}NET00673;
-
-typedef enum	{
 _kAnalog__vkhod_1_0,                      //Аналог. вход 1
 _kAnalog__vkhod_2_1,                      //Аналог. вход 2
 _kASU_2,                                  //АСУ
