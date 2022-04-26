@@ -86,4 +86,5 @@
 #define present_PUSK_READY_2_1           1
 #define present_STOP_2_1                 1
 #define present_END_OF_CURVE_1           1
-// 87
+#define present_PUMP_DERAG_1             1
+// 88

@@ -959,7 +959,17 @@ typedef enum	{
 _kOtkl_0,                                 //Откл
 _kPreduprezhdenie_1,                      //Предупреждение
 _kAvariya_2,                              //Авария
-}NET00682;
+}NET00672;
+
+typedef enum	{
+_kOtklyuchena_0,                          //Отключена
+_kPo_pusku_1,                             //По пуску
+_kPo_stopu_2,                             //По стопу
+_kPoStopu_i_pusku_3,                      //ПоСтопу и пуску
+_kPo_diskr_vkh__4,                        //По дискр.вх.
+_kPo_Moshhnosti_5,                        //По Мощности
+_kPo_Vremeni_6,                           //По Времени
+}NET00674;
 
 typedef enum	{
 _kAnalog__vkhod_1_0,                      //Аналог. вход 1
