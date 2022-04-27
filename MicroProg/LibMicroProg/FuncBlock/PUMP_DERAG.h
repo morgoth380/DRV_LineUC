@@ -29,6 +29,13 @@ typedef enum{
   DERAG_AFTER_WORK = 1
 }currentDeragModeType;
 
+typedef enum{
+  POWER_EVENT_WAITING = 0,
+  POWER_EVENT_COUNT = 1,
+  POWER_ERR_HOLD = 2
+}powerDeragErrStateType;
+
+
 typedef struct{
   u32 deragRunCnt;
   u32 deragOffCnt;
@@ -40,6 +47,12 @@ typedef struct{
   deragStateType deragState;
   u16 startAfterDeragDis;
   currentDeragModeType currentDeragMode;
+  u32 powerIntervalCnt; //Счетчик интервала подсчета процедур очистки по мощности
+  powerDeragErrStateType powerDeragErrState;
+  u16 powerDeragCnt; //Счетчик процедур очистки по превышению мощности
+  u16 powerDeragHoldCnt;
+  u32 intervalStrg[10]; //хранилище интервалов между событиями очистки
+  u16 i;
 }PUMP_DERAG_StateType;
 
 typedef enum{
@@ -111,10 +124,12 @@ typedef struct{
 void deragByStartStop(PUMP_DERAG_StateType *sPnt, FuncPUMP_DERAG_type *progPnt, u32 ramPnt);
 void deragByDin(PUMP_DERAG_StateType *sPnt, FuncPUMP_DERAG_type *progPnt, u32 ramPnt);
 void deragByPower(PUMP_DERAG_StateType *sPnt, FuncPUMP_DERAG_type *progPnt, u32 ramPnt);
+u16 powerDeragErrCheck(u16 powerDeragNum, u16 powerInterval, PUMP_DERAG_StateType *sPnt);
 
 u16 *FuncPUMP_DERAG_1(FuncPUMP_DERAG_type *progPnt, u32 ramPnt)
 {
   deragModeType derugMode;
+  u16 functional;
   PUMP_DERAG_StateType *sPnt;
   sPnt = (PUMP_DERAG_StateType *)(ramPnt + progPnt->Pnt_State);
   
@@ -129,6 +144,28 @@ u16 *FuncPUMP_DERAG_1(FuncPUMP_DERAG_type *progPnt, u32 ramPnt)
     sPnt->deragState = PWM_OFF;
     sPnt->startAfterDeragDis = 0;
     sPnt->currentDeragMode = DERAG_BEFORE_WORK;
+    sPnt->powerDeragErrState = POWER_EVENT_WAITING;
+    return &progPnt->Pnt_End;
+  }
+  
+  functional = load_s16(ramPnt, progPnt->Pnt_Functional);
+  if(functional != UsePumpFunc){
+    sPnt->deragRunCnt = 0;
+    sPnt->deragOffCnt = 0;
+    sPnt->startState = COMMAND_WAITING;
+    sPnt->stopState = COMMAND_WAITING;
+    sPnt->stopHoldCnt = 0;
+    sPnt->startHoldCnt = 0;
+    sPnt->cyclesCnt = 0;
+    sPnt->deragState = PWM_OFF;
+    sPnt->startAfterDeragDis = 0;
+    sPnt->currentDeragMode = DERAG_BEFORE_WORK;
+    clrBitMicro(ramPnt, progPnt->Pnt_StartCmd);
+    clrBitMicro(ramPnt, progPnt->Pnt_StopCmd);
+    clrBitMicro(ramPnt, progPnt->Pnt_DeraggFlg);
+    clrBitMicro(ramPnt, progPnt->Pnt_Err);
+    save_float(ramPnt, progPnt->Pnt_DeraggRef, 0.0F);
+    save_float(ramPnt, progPnt->Pnt_DeragPower, 0.0F);
     return &progPnt->Pnt_End;
   }
   
@@ -173,7 +210,6 @@ void deragByStartStop(PUMP_DERAG_StateType *sPnt, FuncPUMP_DERAG_type *progPnt, 
   deragModeType derugMode;
   f32 deragRef;
   f32 actualSpd;
-  u16 accelFlg, decelFlg;
   u16 deragOffTime;
   u16 cyclesNum;
   u16 DinSignal;
@@ -185,8 +221,6 @@ void deragByStartStop(PUMP_DERAG_StateType *sPnt, FuncPUMP_DERAG_type *progPnt, 
   derugMode = (deragModeType)load_s16(ramPnt, progPnt->Pnt_DeraggFunc);
   PWM_state = testBitMicro(ramPnt, progPnt->Pnt_PWM_On);
   deragRef = load_float(ramPnt, progPnt->Pnt_DeraggSpd);
-  accelFlg = testBitMicro(ramPnt, progPnt->Pnt_GT_Up);
-  decelFlg = testBitMicro(ramPnt, progPnt->Pnt_GT_Down);
   deragRunTime = load_s16(ramPnt, progPnt->Pnt_RunTime);
   actualSpd = load_float(ramPnt, progPnt->Pnt_F_Out);
   deragOffTime = load_s16(ramPnt, progPnt->Pnt_OffDelay);
@@ -557,6 +591,267 @@ void deragByDin(PUMP_DERAG_StateType *sPnt, FuncPUMP_DERAG_type *progPnt, u32 ra
 //Управление очисткой по превышению мощности
 void deragByPower(PUMP_DERAG_StateType *sPnt, FuncPUMP_DERAG_type *progPnt, u32 ramPnt)
 {
+  u16 PWM_state;
+  u16 stopCmd, startCmd;
+  f32 deragRef;
+  f32 actualSpd;
+  u16 deragOffTime;
+  u16 cyclesNum;
+  u16 powerDeragCmd;
+  u16 stopSignal;
+  stopSignalActionType stopSignalAction;
+  u16 drvFail;
+  u16 deragRunTime;
+  u16 powerInterval;
+  u16 powerDeragCmdFlg;
+  u16 powerDeragNum;
+  u16 powerDeragErr;
+  
+  PWM_state = testBitMicro(ramPnt, progPnt->Pnt_PWM_On);
+  deragRef = load_float(ramPnt, progPnt->Pnt_DeraggSpd);
+  deragRunTime = load_s16(ramPnt, progPnt->Pnt_RunTime);
+  actualSpd = load_float(ramPnt, progPnt->Pnt_F_Out);
+  deragOffTime = load_s16(ramPnt, progPnt->Pnt_OffDelay);
+  cyclesNum = load_s16(ramPnt, progPnt->Pnt_CyclesNum);
+  drvFail = testBitMicro(ramPnt, progPnt->Pnt_DrvFail);
+  stopSignal = testBitMicro(ramPnt, progPnt->Pnt_GlobalStop);
+  stopSignalAction = (stopSignalActionType)load_s16(ramPnt, progPnt->Pnt_ModeWhileStop);
+  powerInterval = load_s16(ramPnt, progPnt->Pnt_ConsecTime); //в минутах
+  powerDeragCmd = load_s16(ramPnt, progPnt->Pnt_In5);
+  powerDeragNum = load_s16(ramPnt, progPnt->Pnt_DeragNum); //Уставка количества процедур
+  stopCmd = startCmd = 0;
+  powerDeragCmdFlg = 0;
+  
+  switch(sPnt->deragState){
+  case PWM_OFF:
+    if(PWM_state == 1){
+      //По включению ШИМ переходим к ожиданию команды очистки
+      sPnt->deragState = DERAG_WAIT_FROM_WORK;
+    }
+    break;
+  case DERAG_WAIT_FROM_WORK: //Состояние ожидания события превышения мощности
+    if(PWM_state == 0){
+      sPnt->startAfterDeragDis = 0;
+      sPnt->deragState = PWM_OFF;
+      break;
+    }
+    if(stopSignal == 1){ 
+      sPnt->deragState = STOP_DONE_WAIT;
+      break;
+    }
+    //Если поступила команда очистки, то даем команду останова и 
+    //переходим в состояние ожидания выключения ШИМ
+    if(powerDeragCmd == 1){
+      powerDeragCmdFlg = 1;
+      stopCmd = 1;         
+      sPnt->cyclesCnt = cyclesNum;     
+      sPnt->deragState = STOP_WAITING; 
+    }
+    break;
+  case STOP_WAITING: //Ожидание выключения ШИМ           
+    if(stopSignal == 1){
+      sPnt->deragState = STOP_DONE_WAIT;
+      break;
+    }
+    if(actualSpd != 0.0F){
+      break;
+    }
+    //Скорость обнулилась
+    if(sPnt->cyclesCnt != 0){
+      sPnt->cyclesCnt--;
+      sPnt->deragOffCnt = deragOffTime * K_TIME_CALL_MICRO_TAKT; 
+      sPnt->deragState = DERAG_OFF_DELAY;
+    }else{
+      //Если после очистки можно возвращаться в работу то переходим
+      //к паузе перед возвратом в работу
+      if(sPnt->startAfterDeragDis == 0){
+        sPnt->deragOffCnt = deragOffTime * K_TIME_CALL_MICRO_TAKT;
+        sPnt->deragState = START_DELAY;
+      }else{
+        sPnt->startAfterDeragDis = 0;
+        sPnt->deragState = PWM_OFF;
+      }
+    }
+    break;
+  case DERAG_OFF_DELAY: //Выдержка перед реверсом 
+    sPnt->deragOffCnt--;
+    if(sPnt->deragOffCnt == 0){
+      setBitMicro(ramPnt, progPnt->Pnt_DeraggFlg);           
+      save_float(ramPnt, progPnt->Pnt_DeraggRef, -deragRef); 
+      startCmd = 1; 
+      sPnt->deragState = REVERSE_ACCEL_DONE_WAITING; 
+    }
+    break;
+  case REVERSE_ACCEL_DONE_WAITING: //Ожидание выхода на скорость очистки
+    if(actualSpd == -deragRef){
+      sPnt->deragRunCnt = deragRunTime * K_TIME_CALL_MICRO_TAKT;
+      sPnt->deragState = DERAG_REVERSE_RUN; 
+    }
+    break;
+  case DERAG_REVERSE_RUN: //Работа на реверсивной скорости
+    sPnt->deragRunCnt--;
+    if(sPnt->deragRunCnt == 0){
+      stopCmd = 1; //Даем команду останова и переходим к ожиданию отключения ШИМ
+      save_float(ramPnt, progPnt->Pnt_DeraggRef, 0.0F);
+      sPnt->deragState = REV_STOP_WAITING; 
+    }
+    break;
+  case REV_STOP_WAITING: //Ожидание останова от реверсивного движения
+    if(actualSpd == 0.0F){
+      sPnt->deragOffCnt = deragOffTime * K_TIME_CALL_MICRO_TAKT;
+      sPnt->deragState = DERAG_REV_OFF_DELAY;
+    }
+    break;
+  case DERAG_REV_OFF_DELAY: //8 - Выдержка после реверсивного движения
+    sPnt->deragOffCnt--;
+    if(sPnt->deragOffCnt == 0){
+       startCmd = 1;
+       save_float(ramPnt, progPnt->Pnt_DeraggRef, deragRef);
+       sPnt->deragState = ACCEL_DONE_WAITING; 
+    }
+    break;
+  case ACCEL_DONE_WAITING: //Ожидание разгона в прямом направлении
+    if(actualSpd == deragRef){
+     sPnt->deragRunCnt = deragRunTime * K_TIME_CALL_MICRO_TAKT;
+     sPnt->deragState = DERAG_FWD_RUN;
+    }
+    break;
+  case DERAG_FWD_RUN: //2 - Работа в прямом направлении
+    sPnt->deragRunCnt--;
+    if(sPnt->deragRunCnt == 0){
+      save_float(ramPnt, progPnt->Pnt_DeraggRef, 0.0F);
+      stopCmd = 1; 
+      sPnt->deragState = STOP_WAITING; 
+    }
+    break; 
+    case START_DELAY: 
+      sPnt->deragOffCnt--;
+      if(sPnt->deragOffCnt == 0){
+        startCmd = 1;
+        save_float(ramPnt, progPnt->Pnt_DeraggRef, 0);
+        clrBitMicro(ramPnt, progPnt->Pnt_DeraggFlg);
+        sPnt->deragState = DERAG_WAIT_FROM_WORK;
+      }
+      break;
+    case STOP_DONE_WAIT: 
+      if(PWM_state == 0){
+        sPnt->deragState = PWM_OFF;
+      }
+      break;
+  }
+
+  switch(sPnt->stopState){
+  case COMMAND_WAITING:
+    if(stopCmd == 1){
+      setBitMicro(ramPnt, progPnt->Pnt_StopCmd);
+      sPnt->stopHoldCnt = (u16)(PULSE_DURATION * K_TIME_CALL_MICRO_TAKT + 0.5F);
+      sPnt->stopState = COMMAND_HOLD;
+    }
+    break;
+  case COMMAND_HOLD:
+    if(sPnt->stopHoldCnt == 0){
+      clrBitMicro(ramPnt, progPnt->Pnt_StopCmd);
+      sPnt->stopState = COMMAND_WAITING;
+    }else{
+      sPnt->stopHoldCnt--;
+    }
+    break;
+  }
+  
+  
+  switch(sPnt->startState){
+  case COMMAND_WAITING:
+    if(startCmd == 1){
+      setBitMicro(ramPnt, progPnt->Pnt_StartCmd);
+      sPnt->startHoldCnt = (u16)(PULSE_DURATION * K_TIME_CALL_MICRO_TAKT + 0.5F);
+      sPnt->startState = COMMAND_HOLD;
+    }
+    break;
+  case COMMAND_HOLD:
+    if(sPnt->startHoldCnt == 0){
+      clrBitMicro(ramPnt, progPnt->Pnt_StartCmd);
+      sPnt->startState = COMMAND_WAITING;
+    }else{
+      sPnt->startHoldCnt--;
+    }
+    break;
+  }
+
+  //Управление аварией, формируемой при превышении
+  //количества последовательных процедур очистки по превышению мощности
+  switch(sPnt->powerDeragErrState){
+  case POWER_EVENT_WAITING: //Ожидаем первый импульс. Состояние после подачи питания
+    if(PWM_state == 0){
+      sPnt->powerIntervalCnt = 0;
+      sPnt->i = 0;
+      break;
+    }
+    if(powerDeragCmdFlg == 1){
+      sPnt->powerDeragCnt = 1;    //Засчитываем первый импульс
+      sPnt->powerIntervalCnt = 0; //Счетчик интервала времени между импульсами
+      sPnt->powerDeragErrState = POWER_EVENT_COUNT;
+    }
+    break;
+  case POWER_EVENT_COUNT:
+    if(PWM_state == 0){
+      sPnt->powerDeragErrState = POWER_EVENT_WAITING;
+      break;
+    }
+    sPnt->powerIntervalCnt++;
+    //Ждем сигнал о начале процедуры очистки
+    if(powerDeragCmdFlg == 0){
+      break;
+    }
+    //Сигнал начала процедуры очистки получен
+    if(sPnt->powerDeragCnt < powerDeragNum + 1){
+      sPnt->powerDeragCnt++;
+      sPnt->intervalStrg[sPnt->i] = sPnt->powerIntervalCnt;
+      sPnt->i = (sPnt->i < powerDeragNum - 1) ? sPnt->i + 1 : 0;
+      sPnt->powerIntervalCnt = 0;
+      if(sPnt->powerDeragCnt == powerDeragNum + 1){
+        powerDeragErr = powerDeragErrCheck(powerDeragNum, powerInterval, sPnt);
+        sPnt->powerDeragErrState = powerDeragErr ? POWER_ERR_HOLD:sPnt->powerDeragErrState; 
+      }
+      break;
+    }
+    //Сохраняем значение таймера в циклическом буфере
+    //последовательных интервалов
+    sPnt->intervalStrg[sPnt->i] = sPnt->powerIntervalCnt;
+    sPnt->i = (sPnt->i < powerDeragNum - 1) ? sPnt->i + 1 : 0;
+    //Рассчитваем общую длительность между очистками
+    powerDeragErr = powerDeragErrCheck(powerDeragNum, powerInterval, sPnt);
+    sPnt->powerDeragErrState = powerDeragErr ? POWER_ERR_HOLD:sPnt->powerDeragErrState; 
+  
+    break;
+  case POWER_ERR_HOLD:
+    sPnt->powerDeragHoldCnt--;
+    if(sPnt->powerDeragHoldCnt == 0){
+      sPnt->powerDeragErrState = POWER_EVENT_WAITING;
+    }
+    break;
+  }
+}
+
+//Проверка аварии превышения процедур очистки за интервал времени
+//powerDeragNum - максимальное количество процедур очистки
+//powerInterval - время, за которое разрешено powerDeragNum процедур
+//sPnt - Указатель на статичсекие данные функционального блока
+//retval - 1 - авария, 0 - Ok
+u16 powerDeragErrCheck(u16 powerDeragNum, u16 powerInterval, PUMP_DERAG_StateType *sPnt)
+{
+  u32 summ;
+  u16 i;
+  u16 err;
+  
+  for(summ = 0, i = 0; i < powerDeragNum; i++){
+    summ += sPnt->intervalStrg[i];
+  }
+  if(summ < powerInterval * 60 * K_TIME_CALL_MICRO_TAKT){
+    err = 1;
+  }else{
+    err = 0;
+  }
+  return err;
 }
 
 #endif
